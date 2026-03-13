@@ -1,14 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="96" fill="#1B2838"/>
   <defs>
-    <linearGradient id="a" x1="0" x2="1" y1="0" y2="1">
-      <stop offset="0" stop-color="#1d5d8f" />
-      <stop offset="1" stop-color="#081724" />
+    <linearGradient id="mpGradient" x1="88" y1="380" x2="424" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#14B8A6"/>
+      <stop offset="1" stop-color="#3B82F6"/>
     </linearGradient>
+    <filter id="shadow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
   </defs>
-  <rect width="512" height="512" rx="96" fill="url(#a)" />
-  <path d="M60 352c0-68 56-124 124-124h60v224h-60c-68 0-124-56-124-100z" fill="#e63946" />
-  <path d="M452 352c0-68-56-124-124-124h-60v224h60c68 0 124-56 124-100z" fill="#3a86ff" />
-  <text x="155" y="360" font-family="Impact, sans-serif" font-size="180" fill="#fff">1</text>
-  <text x="283" y="360" font-family="Impact, sans-serif" font-size="180" fill="#fff">2</text>
-  <circle cx="256" cy="140" r="42" fill="#f4b942" />
+  <g filter="url(#shadow)" transform="translate(-30, -19)">
+    <path d="M120 338L280 178C312 146 364 142 401 169C437 195 451 245 436 287C422 326 385 352 344 352H256L154 414L120 338Z" fill="white"/>
+    <path d="M120 338L280 178C312 146 364 142 401 169C437 195 451 245 436 287C422 326 385 352 344 352H256L154 414L120 338Z" stroke="url(#mpGradient)" stroke-width="24" stroke-linejoin="round"/>
+    <circle cx="354" cy="248" r="68" fill="white" stroke="url(#mpGradient)" stroke-width="24"/>
+    <path d="M151 414L256 352" stroke="url(#mpGradient)" stroke-width="24" stroke-linecap="round"/>
+    <rect x="225" y="214" width="54" height="34" rx="10" transform="rotate(18 225 214)" fill="white" stroke="url(#mpGradient)" stroke-width="20"/>
+    <path d="M382 170C391 150 412 136 435 136" stroke="url(#mpGradient)" stroke-width="18" stroke-linecap="round"/>
+  </g>
 </svg>

@@ -1,7 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#081724" />
-  <circle cx="256" cy="256" r="190" fill="#102335" />
-  <path d="M108 330c0-56 44-100 100-100h48v170h-48c-56 0-100-44-100-70z" fill="#f46036" />
-  <path d="M404 330c0-56-44-100-100-100h-48v170h48c56 0 100-44 100-70z" fill="#4ea8de" />
-  <text x="208" y="332" font-family="Impact, sans-serif" font-size="124" fill="#fff">M</text>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="96" fill="#1B2838"/>
+  <defs>
+    <linearGradient id="mpGradient" x1="88" y1="380" x2="424" y2="112" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#14B8A6"/>
+      <stop offset="1" stop-color="#3B82F6"/>
+    </linearGradient>
+    <filter id="shadow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0F172A" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)" transform="translate(-30, -19)">
+    <path d="M120 338L280 178C312 146 364 142 401 169C437 195 451 245 436 287C422 326 385 352 344 352H256L154 414L120 338Z" fill="white"/>
+    <path d="M120 338L280 178C312 146 364 142 401 169C437 195 451 245 436 287C422 326 385 352 344 352H256L154 414L120 338Z" stroke="url(#mpGradient)" stroke-width="24" stroke-linejoin="round"/>
+    <circle cx="354" cy="248" r="68" fill="white" stroke="url(#mpGradient)" stroke-width="24"/>
+    <path d="M151 414L256 352" stroke="url(#mpGradient)" stroke-width="24" stroke-linecap="round"/>
+    <rect x="225" y="214" width="54" height="34" rx="10" transform="rotate(18 225 214)" fill="white" stroke="url(#mpGradient)" stroke-width="20"/>
+    <path d="M382 170C391 150 412 136 435 136" stroke="url(#mpGradient)" stroke-width="18" stroke-linecap="round"/>
+  </g>
 </svg>

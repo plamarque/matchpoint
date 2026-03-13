@@ -35,6 +35,14 @@ Le déploiement est automatique à chaque push sur `main` via le workflow `.gith
 
 Si le dépôt ne s’appelle pas `matchpoint`, adapter `BASE_PATH` dans le workflow (et dans les builds locaux pour preview : `BASE_PATH=/nom-repo/ npm run build`).
 
+## PWA (installation)
+
+L'app est une PWA installable. Pour que Chrome (desktop ou Android) propose **Installer** ou **Ajouter à l'écran d'accueil** avec l'icône :
+
+- Tester en **HTTPS** ou en **localhost** (le mode dev ou un build servi en HTTP non localhost peut ne pas afficher le bouton d'installation).
+- Après déploiement sur GitHub Pages, ouvrir l'URL du site puis utiliser le menu Chrome (⋮) → « Installer Matchpoint » ou sur Android « Ajouter à l'écran d'accueil ».
+- Le manifest inclut les icônes 192×192 et 512×512 requises par Chrome/Android.
+
 ## Notes UX V1
 
 - L’application est pilotée inline sur `/` (pas de panneau de contrôle séparé).
