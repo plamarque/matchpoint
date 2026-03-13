@@ -6,6 +6,8 @@ import { buildControlAppUrl } from "@/remote/controlAppUrl";
 const props = withDefaults(
   defineProps<{
     sessionInfo: { joinCode: string } | null;
+    /** Quand fourni, la modale est pilotée par le parent (ex. télécommande distante). */
+    modelValue?: boolean;
     idleOpacity?: number;
     hoverOpacity?: number;
     hotspotScale?: number;
@@ -13,8 +15,14 @@ const props = withDefaults(
   { idleOpacity: 0.1, hoverOpacity: 0.26, hotspotScale: 1 }
 );
 
-const showModal = ref(false);
+const emit = defineEmits<{ "update:modelValue": [value: boolean] }>();
+
+const showModalLocal = ref(false);
 const qrDataUrl = ref<string | null>(null);
+
+const showModal = computed(() =>
+  props.modelValue !== undefined ? props.modelValue : showModalLocal.value
+);
 
 const controlUrl = computed(() => {
   if (!props.sessionInfo) return null;
@@ -39,11 +47,19 @@ watch(
 );
 
 function openModal() {
-  showModal.value = true;
+  if (props.modelValue !== undefined) {
+    emit("update:modelValue", true);
+  } else {
+    showModalLocal.value = true;
+  }
 }
 
 function closeModal() {
-  showModal.value = false;
+  if (props.modelValue !== undefined) {
+    emit("update:modelValue", false);
+  } else {
+    showModalLocal.value = false;
+  }
 }
 </script>
 

@@ -83,6 +83,7 @@ export type RemoteCommand =
   | { type: "overlay_custom"; text: string }
   | { type: "overlay_clear" }
   | { type: "contrast_toggle" }
+  | { type: "qr_toggle" }
   | { type: "fullscreen_preference"; value: boolean }
   | { type: "fullscreen_toggle" }
   | { type: "reset_match" };

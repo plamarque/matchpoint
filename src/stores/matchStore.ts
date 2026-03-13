@@ -81,6 +81,7 @@ const coerceUi = (source: Partial<MatchState["ui"]> | null | undefined): MatchSt
 
 export const useMatchStore = defineStore("match", () => {
   const match = ref<MatchState>(makeDefaultState());
+  const showRemoteQrModal = ref(false);
   let tickerId: number | null = null;
 
   const hydrate = async () => {
@@ -476,6 +477,14 @@ export const useMatchStore = defineStore("match", () => {
     match.value.ui.contrastMode = match.value.ui.contrastMode === "standard" ? "high" : "standard";
   };
 
+  const setShowRemoteQrModal = (value: boolean) => {
+    showRemoteQrModal.value = value;
+  };
+
+  const toggleRemoteQrModal = () => {
+    showRemoteQrModal.value = !showRemoteQrModal.value;
+  };
+
   const setFullscreenPreference = (value: boolean) => {
     match.value.ui.lastFullscreenChoice = value;
   };
@@ -543,6 +552,9 @@ export const useMatchStore = defineStore("match", () => {
     setPalette,
     updateScale,
     toggleContrast,
+    showRemoteQrModal,
+    setShowRemoteQrModal,
+    toggleRemoteQrModal,
     setFullscreenPreference,
     setGhostOpacity,
     setHotspotScale,

@@ -125,6 +125,9 @@ export function runRemoteCommand(cmd: RemoteCommand, store: MatchStore): void {
     case "contrast_toggle":
       s.toggleContrast();
       return;
+    case "qr_toggle":
+      s.toggleRemoteQrModal();
+      return;
     case "fullscreen_preference":
       s.setFullscreenPreference(cmd.value);
       return;
