@@ -13,10 +13,12 @@ La V1 fournit un pilotage **100% inline**: toutes les modifications se font dire
 - 9 annonces overlays fixes type Gazoo, déclenchées depuis une barre d’icônes.
 - PWA installable, mode offline après premier chargement.
 
+- **Contrôle à distance (optionnel)** : un bouton discret sur l’affichage ouvre un QR code ; le téléphone (même Wi‑Fi ou partage de connexion) peut ouvrir l’app de contrôle (`/control`) et piloter l’affichage via WebSocket. Pas d’app à installer à l’avance (scan = ouverture en ligne ou PWA déjà installée).
+
 ## Hors périmètre V1
 
-- Panneau de contrôle séparé.
-- Synchronisation multi-appareils.
+- Panneau de contrôle séparé **sur la même machine** (remplacé par contrôle inline + option contrôle à distance).
+- Synchronisation multi-appareils **sans même réseau** (cloud, compte).
 - Backend/compte utilisateur/cloud sync.
 - Audio, export/import, historique complet.
 

@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "start": "bash scripts/start-dev.sh",
+    "dev": "vite --host",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
+    "server": "node server/ws-server.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
@@ -14,7 +16,9 @@
   },
   "dependencies": {
     "pinia": "^2.1.7",
+    "qrcode": "^1.5.4",
     "vue": "^3.5.13",
+    "ws": "^8.18.0",
     "vue-router": "^4.5.1"
   },
   "devDependencies": {

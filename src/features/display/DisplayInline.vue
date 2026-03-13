@@ -1,13 +1,27 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import type { Ref } from "vue";
 import { storeToRefs } from "pinia";
 import InlineEditableText from "@/components/InlineEditableText.vue";
 import HotspotLayer from "@/features/display/HotspotLayer.vue";
 import OverlayPanel from "@/features/overlay/OverlayPanel.vue";
+import RemoteControlQR from "@/features/display/RemoteControlQR.vue";
+import { getDisplayWsUrl } from "@/remote/useRemoteChannel";
+import { useRemoteChannel } from "@/remote/useRemoteChannel";
 import { formatClock, parseClock } from "@/services/timerService";
 import { useMatchStore } from "@/stores/matchStore";
 import type { HotspotDefinition, OverlayKey } from "@/types/match";
 import { useKeyboardShortcuts } from "@/utils/useKeyboardShortcuts";
+
+const REMOTE_WS_PORT = 8765;
+let serverInfo: Ref<{ host: string; port: number } | null>;
+try {
+  const channel = useRemoteChannel(computed(() => getDisplayWsUrl("localhost", REMOTE_WS_PORT)));
+  serverInfo = channel.serverInfo;
+} catch (e) {
+  console.error("[Matchpoint] useRemoteChannel:", e);
+  serverInfo = ref(null);
+}
 
 const store = useMatchStore();
 const { match } = storeToRefs(store);
@@ -495,6 +509,13 @@ onUnmounted(() => {
       :hover-opacity="match.ui.ghostHoverOpacity"
       :hotspot-scale="match.ui.hotspotScale"
       @action="applyAction"
+    />
+
+    <RemoteControlQR
+      :server-info="serverInfo"
+      :idle-opacity="match.ui.ghostIdleOpacity"
+      :hover-opacity="match.ui.ghostHoverOpacity"
+      :hotspot-scale="match.ui.hotspotScale"
     />
 
     <OverlayPanel
