@@ -420,7 +420,7 @@ onUnmounted(() => {
               {{ improPlayPauseIcon }}
             </button>
             <button
-              class="ghost-hotspot timer-action-btn"
+              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
               type="button"
               aria-label="Reset impro"
               @click="store.resetImpro"
@@ -506,7 +506,7 @@ onUnmounted(() => {
               {{ periodPlayPauseIcon }}
             </button>
             <button
-              class="ghost-hotspot timer-action-btn"
+              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
               type="button"
               aria-label="Reset période"
               @click="store.resetPeriod"
