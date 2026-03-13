@@ -42,16 +42,17 @@ const syncContrastToDocument = () => {
   document.documentElement.classList.toggle("contrast-high", isHigh);
 };
 
+/** Libellé complet pour l’affichage : "Période 1", "Première période", etc. */
 const displayPeriodLabel = computed(() => {
   if (match.value.periodLabel === "premiere") {
-    return "première";
+    return "Première période";
   }
 
   if (match.value.periodLabel === "derniere") {
-    return "dernière";
+    return "Dernière période";
   }
 
-  return match.value.periodLabel;
+  return `Période ${match.value.periodLabel}`;
 });
 
 const improTypeLabel = computed(() => {
@@ -362,7 +363,7 @@ onUnmounted(() => {
           >
             ←
           </button>
-          <p class="period-label">Période {{ displayPeriodLabel }}</p>
+          <p class="period-label">{{ displayPeriodLabel }}</p>
           <button
             type="button"
             class="period-nav-btn"
@@ -512,6 +513,8 @@ onUnmounted(() => {
     />
 
     <RemoteControlQR
+      :model-value="store.showRemoteQrModal"
+      @update:model-value="store.setShowRemoteQrModal"
       :session-info="sessionInfo"
       :idle-opacity="match.ui.ghostIdleOpacity"
       :hover-opacity="match.ui.ghostHoverOpacity"

@@ -31,12 +31,12 @@ const improType = ref<"mixte" | "comparee" | "none">("mixte");
 /** Période courante (suivi local, index dans PERIOD_LABELS). */
 const periodIndex = ref(0);
 
-/** Même intitulé que sur l’écran d’affichage : "Période 1", "Période première", etc. */
+/** Même intitulé que sur l’écran d’affichage : "Période 1", "Première période", etc. */
 function periodLabelDisplay(): string {
   const key = PERIOD_LABELS[periodIndex.value];
   if (!key) return "Période";
-  if (key === "premiere") return "Période première";
-  if (key === "derniere") return "Période dernière";
+  if (key === "premiere") return "Première période";
+  if (key === "derniere") return "Dernière période";
   return `Période ${key}`;
 }
 
@@ -715,6 +715,7 @@ function onCustomAnnounceButtonClick() {
         <section class="control-section">
           <div class="control-row">
             <button type="button" class="control-btn" @click="send({ type: 'contrast_toggle' })">Contraste</button>
+            <button type="button" class="control-btn" @click="send({ type: 'qr_toggle' })">QR code</button>
             <button type="button" class="control-btn danger" @click="send({ type: 'reset_match' })">Reset match</button>
           </div>
         </section>
