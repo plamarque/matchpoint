@@ -35,8 +35,10 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,svg,png,ico,json}"],
-        navigateFallback: "/index.html",
-        cleanupOutdatedCaches: true
+        navigateFallback: base === "/" ? "/index.html" : `${base}index.html`,
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true
       },
       devOptions: {
         enabled: true,
