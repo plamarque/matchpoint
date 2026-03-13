@@ -210,7 +210,7 @@ onUnmounted(() => {
         placeholder="Titre de l'improvisation"
         @update:model-value="store.setTheme"
       />
-      <div class="category-type-line">
+      <div class="category-type-line header-meta">
         <InlineEditableText
           aria-label="Catégorie"
           class-name="category-inline"
@@ -231,6 +231,27 @@ onUnmounted(() => {
     </header>
 
     <section class="score-grid inline-grid">
+      <div class="score-grid-label score-grid-label--category">
+        <InlineEditableText
+          aria-label="Catégorie"
+          class-name="category-inline score-column-category"
+          :model-value="match.impro.category"
+          placeholder="Catégorie"
+          @update:model-value="store.setCategory"
+        />
+      </div>
+      <div class="score-grid-label score-grid-label--spacer" aria-hidden="true" />
+      <div class="score-grid-label score-grid-label--type">
+        <button
+          class="inline-editable impro-type-inline score-column-type"
+          :class="{ 'impro-type-inline--filled': isImproTypeFilled }"
+          type="button"
+          aria-label="Type d'impro (cliquer pour changer)"
+          @click="store.toggleImproType"
+        >
+          {{ improTypeLabel }}
+        </button>
+      </div>
       <article class="team-card" :style="{ '--team-color': match.teamA.colorToken }">
         <InlineEditableText
           aria-label="Nom équipe A"

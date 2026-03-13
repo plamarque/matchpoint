@@ -1087,6 +1087,158 @@ function onCustomAnnounceButtonClick() {
   gap: 1rem;
 }
 
+/* iPad paysage 1024×768 : zones score à gauche et à droite, centre au milieu */
+@media (min-width: 900px) and (orientation: landscape), (min-width: 1024px) {
+  .control-app {
+    padding: 0.75rem;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .control-main {
+    display: grid;
+    grid-template-columns: 1fr minmax(280px, 2fr) 1fr;
+    grid-template-rows: auto auto auto auto auto;
+    gap: 0.75rem 1rem;
+    flex: 1;
+    min-height: 0;
+    align-content: start;
+  }
+
+  /* Section impro (titre, type, chrono) au centre */
+  .control-main > .control-section:nth-child(1) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  /* Section scores : display contents pour placer chaque équipe en col 1 et 3 */
+  .control-main > .control-section:nth-child(2) {
+    display: contents;
+  }
+
+  .control-main > .control-section:nth-child(2) .control-scores {
+    display: contents;
+  }
+
+  .control-main > .control-section:nth-child(2) .control-team-block:nth-child(1) {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .control-main > .control-section:nth-child(2) .control-team-block:nth-child(2) {
+    grid-column: 3;
+    grid-row: 2;
+    align-self: start;
+  }
+
+  .control-main > .control-section:nth-child(3) {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .control-main > .control-section:nth-child(4) {
+    grid-column: 2;
+    grid-row: 4;
+  }
+
+  .control-main > .control-section:nth-child(5) {
+    grid-column: 2;
+    grid-row: 5;
+  }
+
+  .control-scores {
+    gap: 0;
+  }
+
+  .control-team-block {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .control-overlays {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.4rem;
+  }
+
+  .control-overlay-btn {
+    min-height: 48px;
+    padding: 0.5rem 0.35rem;
+  }
+
+  .control-overlay-label {
+    font-size: 0.65rem;
+  }
+
+  .control-header {
+    margin-bottom: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .control-timer-row {
+    margin-bottom: 0.5rem;
+  }
+
+  .control-field {
+    margin-bottom: 0.35rem;
+  }
+
+  .control-section h2,
+  .control-subsection-title {
+    margin-top: 0.25rem;
+  }
+}
+
+/* Hauteur limitée (ex. iPad 768px) : encore plus compact */
+@media (min-width: 900px) and (max-height: 800px) {
+  .control-app {
+    padding: 0.5rem;
+  }
+
+  .control-main {
+    gap: 0.5rem 1rem;
+  }
+
+  .control-input,
+  .control-team-name-input {
+    min-height: 40px;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .control-btn {
+    min-height: 44px;
+    padding: 0.6rem 0.85rem;
+  }
+
+  .control-timer-row .control-btn {
+    height: 48px;
+    min-height: 48px;
+  }
+
+  .control-score-stepper {
+    height: 48px;
+  }
+
+  .control-team-color-btn,
+  .control-penalty-dot {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .control-radio {
+    min-height: 40px;
+  }
+
+  .control-overlay-btn {
+    min-height: 44px;
+  }
+}
+
 .control-team-block {
   display: flex;
   flex-direction: column;
