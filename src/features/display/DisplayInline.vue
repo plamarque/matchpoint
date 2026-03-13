@@ -13,17 +13,29 @@ import type { HotspotDefinition, OverlayKey } from "@/types/match";
 import { useKeyboardShortcuts } from "@/utils/useKeyboardShortcuts";
 
 const remoteBackendUrl = (import.meta.env as { VITE_REMOTE_BACKEND_WS_URL?: string }).VITE_REMOTE_BACKEND_WS_URL ?? "";
+const store = useMatchStore();
+const { match } = storeToRefs(store);
+
+const triggerFullscreen = async () => {
+  if (!document.fullscreenElement) {
+    await document.documentElement.requestFullscreen();
+    store.setFullscreenPreference(true);
+    return;
+  }
+  await document.exitFullscreen();
+  store.setFullscreenPreference(false);
+};
+
 let sessionInfo: Ref<{ sessionId: string; joinCode: string } | null>;
 try {
-  const channel = useRemoteChannel(computed(() => remoteBackendUrl));
+  const channel = useRemoteChannel(computed(() => remoteBackendUrl), {
+    onFullscreenToggle: triggerFullscreen
+  });
   sessionInfo = channel.sessionInfo;
 } catch (e) {
   console.error("[Matchpoint] useRemoteChannel:", e);
   sessionInfo = ref(null);
 }
-
-const store = useMatchStore();
-const { match } = storeToRefs(store);
 
 const syncContrastToDocument = () => {
   const isHigh = match.value.ui.contrastMode === "high";
@@ -96,17 +108,6 @@ const hotspotsColorA = computed<HotspotDefinition[]>(() => [
 const hotspotsColorB = computed<HotspotDefinition[]>(() => [
   { id: "hotspot_color_cycle_b", label: "Couleur B suivante", action: "color_cycle_b", x: 95, y: 50, width: 4.5, height: 34, centerY: true }
 ]);
-
-const triggerFullscreen = async () => {
-  if (!document.fullscreenElement) {
-    await document.documentElement.requestFullscreen();
-    store.setFullscreenPreference(true);
-    return;
-  }
-
-  await document.exitFullscreen();
-  store.setFullscreenPreference(false);
-};
 
 const onOverlayButtonClick = (overlayKey: string) => {
   if (overlayKey === "overlay_custom") {

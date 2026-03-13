@@ -84,6 +84,7 @@ export type RemoteCommand =
   | { type: "overlay_clear" }
   | { type: "contrast_toggle" }
   | { type: "fullscreen_preference"; value: boolean }
+  | { type: "fullscreen_toggle" }
   | { type: "reset_match" };
 
 export function isServerInfo(msg: unknown): msg is ServerInfoMessage {

@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import {
-  BUILTIN_TEAM_COLORS,
+  getNextTeamColor,
   IMPRO_SECOND_STEPS,
   IMPRO_TIME_PRESETS_SECONDS,
   OVERLAY_DURATION_MS,
@@ -78,15 +78,6 @@ const coerceUi = (source: Partial<MatchState["ui"]> | null | undefined): MatchSt
   ...defaultUi,
   ...(source ?? {})
 });
-
-const nextColor = (current: string): string => {
-  const index = BUILTIN_TEAM_COLORS.findIndex((color) => color === current);
-  if (index === -1) {
-    return BUILTIN_TEAM_COLORS[0];
-  }
-
-  return BUILTIN_TEAM_COLORS[(index + 1) % BUILTIN_TEAM_COLORS.length];
-};
 
 export const useMatchStore = defineStore("match", () => {
   const match = ref<MatchState>(makeDefaultState());
@@ -463,11 +454,11 @@ export const useMatchStore = defineStore("match", () => {
 
   const cycleTeamColor = (team: TeamKey) => {
     if (team === "A") {
-      match.value.teamA.colorToken = nextColor(match.value.teamA.colorToken);
+      match.value.teamA.colorToken = getNextTeamColor(match.value.teamA.colorToken);
       return;
     }
 
-    match.value.teamB.colorToken = nextColor(match.value.teamB.colorToken);
+    match.value.teamB.colorToken = getNextTeamColor(match.value.teamB.colorToken);
   };
 
   const setPalette = (key: keyof typeof TEAM_PALETTES) => {

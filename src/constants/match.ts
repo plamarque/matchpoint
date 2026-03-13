@@ -55,3 +55,10 @@ export const BUILTIN_TEAM_COLORS = [
   "#f4f1de",
   "#4f772d"
 ];
+
+/** Cycle de couleur équipe : même logique que l’affichage (store). À utiliser côté remote et store. */
+export function getNextTeamColor(current: string): string {
+  const index = BUILTIN_TEAM_COLORS.indexOf(current);
+  if (index === -1) return BUILTIN_TEAM_COLORS[0];
+  return BUILTIN_TEAM_COLORS[(index + 1) % BUILTIN_TEAM_COLORS.length];
+}

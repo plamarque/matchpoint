@@ -18,8 +18,13 @@ function unwrapUrl(wsUrl: unknown): string | null {
   return typeof wsUrl === "string" ? wsUrl : null;
 }
 
-export function useRemoteChannel(backendWsUrl: unknown) {
+export interface RemoteChannelOptions {
+  onFullscreenToggle?: () => void;
+}
+
+export function useRemoteChannel(backendWsUrl: unknown, options?: RemoteChannelOptions) {
   const store = useMatchStore();
+  const onFullscreenToggle = options?.onFullscreenToggle;
   const sessionInfo = ref<{ sessionId: string; joinCode: string } | null>(null);
   const connected = ref(false);
   const error = ref<string | null>(null);
@@ -54,14 +59,23 @@ export function useRemoteChannel(backendWsUrl: unknown) {
           return;
         }
         if (isCommandMessage(data) && data.payload != null) {
+          const cmd = data.payload;
+          if (cmd.type === "fullscreen_toggle" && onFullscreenToggle) {
+            onFullscreenToggle();
+            return;
+          }
           try {
-            runRemoteCommand(data.payload, store);
+            runRemoteCommand(cmd, store);
           } catch (err) {
             console.warn("[Matchpoint] Commande remote ignorée:", err);
           }
           return;
         }
         if (isRemoteCommand(data)) {
+          if (data.type === "fullscreen_toggle" && onFullscreenToggle) {
+            onFullscreenToggle();
+            return;
+          }
           try {
             runRemoteCommand(data, store);
           } catch (err) {
