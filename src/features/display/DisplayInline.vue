@@ -62,9 +62,9 @@ const improTypeLabel = computed(() => {
   if (match.value.impro.type === "comparee") {
     return "Comparée";
   }
-  return "";
+  return "\u00A0";
 });
-const showImproType = computed(() => improTypeLabel.value.length > 0);
+const isImproTypeFilled = computed(() => match.value.impro.type !== "none");
 const improPlayPauseIcon = computed(() => (match.value.impro.isRunning ? "⏸" : "▶"));
 const periodPlayPauseIcon = computed(() =>
   match.value.periodTimer.startedAt !== null ? "⏸" : "▶"
@@ -226,14 +226,14 @@ onUnmounted(() => {
           placeholder="Catégorie"
           @update:model-value="store.setCategory"
         />
-        <span v-if="showImproType" class="category-separator" aria-hidden="true">•</span>
         <button
           class="inline-editable impro-type-inline"
+          :class="{ 'impro-type-inline--filled': isImproTypeFilled }"
           type="button"
-          aria-label="Type d'impro"
+          aria-label="Type d'impro (cliquer pour changer)"
           @click="store.toggleImproType"
         >
-          {{ improTypeLabel || "\u00A0" }}
+          {{ improTypeLabel }}
         </button>
       </div>
     </header>
