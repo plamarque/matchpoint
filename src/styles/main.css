@@ -7,7 +7,7 @@
   --success: #64df9e;
   --radius: 18px;
   --display-scale: 1;
-  --ghost-idle-opacity: 0.1;
+  --ghost-idle-opacity: 0;
   --ghost-hover-opacity: 0.26;
   --font-display: "Archivo Black", "Avenir Next Condensed", "Impact", sans-serif;
   --font-ui: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
@@ -255,7 +255,7 @@ body,
   cursor: pointer;
   touch-action: manipulation;
   background: none;
-  opacity: max(var(--ghost-idle-opacity), 0.03);
+  opacity: var(--ghost-idle-opacity);
   z-index: 12;
   transition: opacity 0.15s;
   /* Zone cliquable plus grande que le triangle visible */
@@ -291,7 +291,7 @@ body,
   border-radius: 14px;
   background: rgb(255 255 255 / 20%);
   color: #fff;
-  opacity: max(var(--ghost-idle-opacity), 0.03);
+  opacity: var(--ghost-idle-opacity);
   cursor: pointer;
   font-family: var(--font-display);
   font-size: clamp(1.5rem, 3vw, 3rem);
@@ -450,7 +450,7 @@ body,
   font-size: clamp(1.25rem, 2.2vw, 2rem);
   line-height: 1;
   text-transform: none;
-  opacity: max(var(--ghost-idle-opacity), 0.2);
+  opacity: var(--ghost-idle-opacity);
 }
 
 .impro-controls-row,
@@ -517,7 +517,7 @@ body,
 }
 
 .ghost-hotspot.score-control {
-  opacity: max(var(--ghost-idle-opacity), 0.03);
+  opacity: var(--ghost-idle-opacity);
 }
 
 .ghost-hotspot span {
@@ -607,6 +607,13 @@ body,
 
 .overlay-hotbar-inline .overlay-icon-btn {
   pointer-events: auto;
+  /* Barre d’annonces en bas : rester légèrement visibles sans hover pour viser le bon bouton */
+  opacity: max(var(--ghost-idle-opacity), 0.1);
+}
+
+.overlay-hotbar-inline .overlay-icon-btn:hover,
+.overlay-hotbar-inline .overlay-icon-btn:focus-visible {
+  opacity: var(--ghost-hover-opacity);
 }
 
 .overlay-icon {

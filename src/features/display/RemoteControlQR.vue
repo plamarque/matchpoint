@@ -12,7 +12,7 @@ const props = withDefaults(
     hoverOpacity?: number;
     hotspotScale?: number;
   }>(),
-  { idleOpacity: 0.1, hoverOpacity: 0.26, hotspotScale: 1 }
+  { idleOpacity: 0, hoverOpacity: 0.26, hotspotScale: 1 }
 );
 
 const emit = defineEmits<{ "update:modelValue": [value: boolean] }>();
