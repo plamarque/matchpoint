@@ -345,6 +345,13 @@ function send(cmd: RemoteCommand) {
   }
 }
 
+/** Reset match côté afficheur + synchroniser les couleurs locales (palette classique comme le store). */
+function resetMatch() {
+  teamColorA.value = TEAM_PALETTES.classic[0];
+  teamColorB.value = TEAM_PALETTES.classic[1];
+  send({ type: "reset_match" });
+}
+
 function sendScoreUp(team: TeamKey) {
   if (team === "A") scoreA.value += 1;
   else scoreB.value += 1;
@@ -716,7 +723,7 @@ function onCustomAnnounceButtonClick() {
           <div class="control-row">
             <button type="button" class="control-btn" @click="send({ type: 'contrast_toggle' })">Contraste</button>
             <button type="button" class="control-btn" @click="send({ type: 'qr_toggle' })">QR code</button>
-            <button type="button" class="control-btn danger" @click="send({ type: 'reset_match' })">Reset match</button>
+            <button type="button" class="control-btn danger" @click="resetMatch">Reset match</button>
           </div>
         </section>
       </main>
