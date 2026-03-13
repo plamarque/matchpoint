@@ -61,6 +61,11 @@ function closeModal() {
     showModalLocal.value = false;
   }
 }
+
+function onButtonClick(e: MouseEvent) {
+  openModal();
+  (e.currentTarget as HTMLElement | null)?.blur();
+}
 </script>
 
 <template>
@@ -74,12 +79,13 @@ function closeModal() {
   >
     <button
       type="button"
-      class="ghost-hotspot"
-      :aria-label="sessionInfo ? 'Contrôle par smartphone' : 'Télécommande indisponible'"
+      class="ghost-hotspot ghost-hotspot--icon-label"
+      :aria-label="sessionInfo ? 'Télécommande' : 'Télécommande indisponible'"
       :title="sessionInfo ? 'Scannez pour piloter depuis votre téléphone' : 'La télécommande n’est pas disponible sans connexion Internet'"
-      @click="openModal"
+      data-label="Télécommande"
+      @click="onButtonClick"
     >
-      <span class="ghost-label">QR</span>
+      <span class="ghost-label ghost-icon" aria-hidden="true">▦</span>
     </button>
   </div>
 

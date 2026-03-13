@@ -42,6 +42,11 @@ const syncContrastToDocument = () => {
   document.documentElement.classList.toggle("contrast-high", isHigh);
 };
 
+const isFullscreen = ref(!!document.fullscreenElement);
+const updateFullscreenState = () => {
+  isFullscreen.value = !!document.fullscreenElement;
+};
+
 /** Libellé complet pour l’affichage : "Période 1", "Première période", etc. */
 const displayPeriodLabel = computed(() => {
   if (match.value.periodLabel === "premiere") {
@@ -97,10 +102,17 @@ const overlayIcon = (key: string): string => {
   return icons[key] ?? "•";
 };
 
-const hotspots = computed<HotspotDefinition[]>(() => [
-  { id: "hotspot_fullscreen_toggle", label: "Plein écran", action: "fullscreen_toggle", x: 93, y: 2, width: 6, height: 7 },
-  { id: "hotspot_contrast_toggle", label: "Contraste", action: "contrast_toggle", x: 1, y: 2, width: 6, height: 7 }
-]);
+// Plein écran à gauche : sur iPad le bouton natif de sortie plein écran est en haut à gauche, il coïncide ainsi avec notre bouton.
+// En mode plein écran on masque le bouton Plein écran : la croix native le remplace.
+const hotspotDefinitions: HotspotDefinition[] = [
+  { id: "hotspot_fullscreen_toggle", label: "Plein écran", action: "fullscreen_toggle", x: 1, y: 2, width: 6, height: 7 },
+  { id: "hotspot_contrast_toggle", label: "Contraste", action: "contrast_toggle", x: 93, y: 2, width: 6, height: 7 }
+];
+const hotspots = computed<HotspotDefinition[]>(() =>
+  isFullscreen.value
+    ? hotspotDefinitions.filter((h) => h.action !== "fullscreen_toggle")
+    : hotspotDefinitions
+);
 
 const onOverlayButtonClick = (overlayKey: string) => {
   if (overlayKey === "overlay_custom") {
@@ -189,9 +201,11 @@ watch(
 onMounted(async () => {
   await store.hydrate();
   syncContrastToDocument();
+  document.addEventListener("fullscreenchange", updateFullscreenState);
 });
 
 onUnmounted(() => {
+  document.removeEventListener("fullscreenchange", updateFullscreenState);
   document.documentElement.classList.remove("contrast-high");
   void store.persist();
 });

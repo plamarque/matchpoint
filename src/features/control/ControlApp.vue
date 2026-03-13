@@ -722,7 +722,7 @@ function onCustomAnnounceButtonClick() {
         <section class="control-section">
           <div class="control-row">
             <button type="button" class="control-btn" @click="send({ type: 'contrast_toggle' })">Contraste</button>
-            <button type="button" class="control-btn" @click="send({ type: 'qr_toggle' })">QR code</button>
+            <button type="button" class="control-btn" @click="send({ type: 'qr_toggle' })">Télécommande</button>
             <button type="button" class="control-btn danger" @click="resetMatch">Reset match</button>
           </div>
         </section>

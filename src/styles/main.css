@@ -539,7 +539,7 @@ body,
 /* Contraste / Plein écran : icône semi-transparente, libellé en dessous au hover (comme overlay-icon-btn) */
 /* Ne pas mettre position: relative ici : ça écraserait le position: absolute du .ghost-hotspot et désalignerait les boutons. */
 .ghost-hotspot--icon-label .ghost-icon {
-  font-size: 1.2rem;
+  font-size: 1.6rem;
   opacity: inherit;
 }
 

@@ -28,6 +28,12 @@ const hotspotSymbol = (action: string): string => {
 /** Icône seule avec libellé au hover (comme overlay-icon-btn) */
 const isIconLabelHotspot = (action: string): boolean =>
   action === "fullscreen_toggle" || action === "contrast_toggle";
+
+function onHotspotClick(e: MouseEvent, action: string) {
+  emit("action", action);
+  // Sur tactile, retirer le focus pour que le libellé ne reste pas affiché après le tap
+  (e.currentTarget as HTMLElement | null)?.blur();
+}
 </script>
 
 <template>
@@ -58,7 +64,7 @@ const isIconLabelHotspot = (action: string): boolean =>
       :aria-label="spot.label"
       :title="spot.label"
       :data-label="isIconLabelHotspot(String(spot.action)) ? spot.label : undefined"
-      @click="emit('action', String(spot.action))"
+      @click="onHotspotClick($event, String(spot.action))"
     >
       <span class="ghost-label" :class="{ 'ghost-icon': isIconLabelHotspot(String(spot.action)) }">
         {{ hotspotSymbol(String(spot.action)) || spot.label }}
