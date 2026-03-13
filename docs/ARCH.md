@@ -9,7 +9,7 @@
   - contrôles fantômes inline (boutons semi-transparents intégrés dans les blocs visuels)
   - `HotspotLayer` pour actions globales projet (période, fullscreen, contraste)
 - PWA offline/installable via Workbox.
-- **Contrôle à distance** : backend WebSocket distant (déployable sur Google Cloud Run). L’affichage se connecte au backend (URL via `VITE_REMOTE_BACKEND_WS_URL`), crée une session et reçoit un code ; le QR code pointe vers `/control?code=`. Le téléphone ouvre l’app (en ligne ou PWA), rejoint la session avec le code et envoie des commandes ; le backend relaie vers l’affichage ; `commandRunner` applique les commandes au store. Sans backend ou sans Internet, la télécommande est indisponible (message générique), le pilotage local reste intact.
+- **Contrôle à distance (bidirectionnel)** : backend WebSocket distant (déployable sur Google Cloud Run). L’affichage se connecte au backend (URL via `VITE_REMOTE_BACKEND_WS_URL`), crée une session et reçoit un code ; le QR code pointe vers `/control?code=`. Le téléphone ouvre l’app (en ligne ou PWA), rejoint la session avec le code et envoie des commandes ; le backend relaie vers l’affichage ; `commandRunner` applique les commandes au store. L’affichage pousse en outre un snapshot d’état vers le backend (throttlé) ; le backend le stocke et le relaie aux télécommandes connectées. À la connexion d’un remote, le dernier état connu est envoyé. Ainsi, les modifications faites sur l’écran (ordi) ou sur la télécommande se reflètent des deux côtés : deux opérateurs peuvent collaborer en temps réel. Sans backend ou sans Internet, la télécommande est indisponible (message générique), le pilotage local reste intact.
 
 ## Composants clés
 
@@ -23,7 +23,7 @@
 | **Timer Service** | Tick basé timestamp (robuste) |
 | **Persistence Service** | Préférences UI locales versionnées |
 | **RemoteControlQR** | Bouton discret + modale QR pour ouvrir l’app contrôle sur le téléphone |
-| **ControlApp** (`/control`) | UI mobile-first d’envoi de commandes WebSocket (scores, chronos, overlays, etc.) |
+| **ControlApp** (`/control`) | UI mobile-first : envoi de commandes WebSocket et réception des snapshots d’état pour rester synchronisée avec l’affichage |
 | **remote/commandRunner** | Exécution des commandes reçues sur le store (affichage) |
 
 ## Décisions structurantes

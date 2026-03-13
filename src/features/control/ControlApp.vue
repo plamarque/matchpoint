@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import type { RemoteCommand } from "@/remote/commands";
-import { isSessionJoinedMessage, isSessionError } from "@/remote/commands";
+import { isSessionJoinedMessage, isSessionError, isStateMessage } from "@/remote/commands";
+import type { RemoteStateSnapshot } from "@/types/match";
 import { getNextTeamColor, OVERLAY_LABELS, PERIOD_LABELS, TEAM_PALETTES } from "@/constants/match";
 import type { OverlayKey } from "@/types/match";
 import type { TeamKey } from "@/types/match";
@@ -27,6 +28,10 @@ const teamColorB = ref(TEAM_PALETTES.classic[1]);
 
 /** Type d’impro (suivi local). */
 const improType = ref<"mixte" | "comparee" | "none">("mixte");
+
+/** Titre et catégorie (sync avec l'affichage). */
+const improTheme = ref("Titre de l'improvisation");
+const improCategory = ref("Libre");
 
 /** Période courante (suivi local, index dans PERIOD_LABELS). */
 const periodIndex = ref(0);
@@ -274,6 +279,71 @@ function nudgePeriodSeconds(direction: 1 | -1) {
   applyPeriodFromMinSec();
 }
 
+/** Applique un snapshot d’état reçu du backend (sync bidirectionnelle). */
+function applyState(payload: RemoteStateSnapshot) {
+  const tA = payload.teamA;
+  const tB = payload.teamB;
+  scoreA.value = Math.max(0, tA?.score ?? 0);
+  scoreB.value = Math.max(0, tB?.score ?? 0);
+  penaltyA.value = Math.min(3, Math.max(0, tA?.penalties ?? 0));
+  penaltyB.value = Math.min(3, Math.max(0, tB?.penalties ?? 0));
+  teamNameA.value = tA?.name?.trim() || "Rouges";
+  teamNameB.value = tB?.name?.trim() || "Bleus";
+  teamColorA.value = tA?.colorToken ?? TEAM_PALETTES.classic[0];
+  teamColorB.value = tB?.colorToken ?? TEAM_PALETTES.classic[1];
+
+  const idx = Number(payload.periodIndex);
+  periodIndex.value = Number.isFinite(idx) && idx >= 0 && idx < PERIOD_LABELS.length ? idx : 0;
+
+  const impro = payload.impro;
+  if (impro) {
+    improTheme.value = typeof impro.theme === "string" ? impro.theme : "Titre de l'improvisation";
+    improCategory.value = typeof impro.category === "string" ? impro.category : "Libre";
+    improType.value = impro.type ?? "mixte";
+    const improPreset = Math.max(0, impro.presetSeconds ?? 60);
+    improPresetSeconds.value = improPreset;
+    improMinutesInput.value = String(Math.floor(improPreset / 60));
+    improSecondsInput.value = String(improPreset % 60);
+    const rem = Math.max(0, impro.remainingSeconds ?? 60);
+    if (impro.isRunning) {
+      improRunning.value = true;
+      improStartTime.value = Date.now();
+      improDurationSec.value = rem;
+      improRemainingWhenPaused.value = null;
+      improCountdownText.value = formatCountdown(rem);
+    } else {
+      improRunning.value = false;
+      improStartTime.value = null;
+      improRemainingWhenPaused.value = rem;
+      improCountdownText.value = formatCountdown(rem);
+    }
+  }
+
+  const pTimer = payload.periodTimer;
+  if (pTimer) {
+    const periodPreset = Math.max(60, pTimer.presetSeconds ?? 30 * 60);
+    periodPresetSeconds.value = periodPreset;
+    periodMinutesInput.value = String(Math.floor(periodPreset / 60));
+    periodSecondsInput.value = String(periodPreset % 60);
+    const pRem = Math.max(0, pTimer.remainingSeconds ?? 30 * 60);
+    if (pTimer.isRunning) {
+      periodRunning.value = true;
+      periodStartTime.value = Date.now();
+      periodDurationSec.value = pRem;
+      periodRemainingWhenPaused.value = null;
+      periodCountdownText.value = formatCountdown(pRem);
+    } else {
+      periodRunning.value = false;
+      periodStartTime.value = null;
+      periodRemainingWhenPaused.value = pRem;
+      periodCountdownText.value = formatCountdown(pRem);
+    }
+  }
+
+  const ov = payload.overlay;
+  activeOverlayKey.value = (ov?.activeOverlay ?? null) as OverlayKey | null;
+}
+
 function parseQueryParams() {
   const params = new URLSearchParams(location.search);
   const c = params.get("code");
@@ -322,6 +392,10 @@ function connect() {
         }
         if (isSessionError(data)) {
           connectError.value = data.message;
+          return;
+        }
+        if (isStateMessage(data) && data.payload) {
+          applyState(data.payload);
         }
       } catch {
         // ignore
@@ -473,22 +547,24 @@ function onCustomAnnounceButtonClick() {
         <section class="control-section">
           <div class="control-field">
             <input
+              v-model="improTheme"
               type="text"
               class="control-input"
               placeholder="Titre de l'improvisation"
               aria-label="Titre"
               @keydown.enter="(e: Event) => (e.target as HTMLInputElement).blur()"
-              @blur="(e: Event) => send({ type: 'set_theme', value: (e.target as HTMLInputElement).value.trim() })"
+              @blur="send({ type: 'set_theme', value: improTheme.trim() })"
             />
           </div>
           <div class="control-field">
             <input
+              v-model="improCategory"
               type="text"
               class="control-input"
               placeholder="Libre"
               aria-label="Catégorie"
               @keydown.enter="(e: Event) => (e.target as HTMLInputElement).blur()"
-              @blur="(e: Event) => send({ type: 'set_category', value: (e.target as HTMLInputElement).value.trim() })"
+              @blur="send({ type: 'set_category', value: improCategory.trim() })"
             />
           </div>
           <div class="control-field">

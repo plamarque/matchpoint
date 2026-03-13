@@ -102,6 +102,7 @@ wss.on("connection", (ws) => {
           joinCode,
           displayWs: ws,
           remoteWs: null,
+          lastState: null,
           createdAt: Date.now(),
           lastActivity: Date.now()
         };
@@ -134,10 +135,25 @@ wss.on("connection", (ws) => {
         session.lastActivity = Date.now();
         wsToSession.set(ws, { sessionId: sid, role: "remote" });
         send(ws, { type: "session:joined" });
+        if (session.lastState != null) {
+          send(ws, { type: "state", payload: session.lastState });
+        }
         send(session.displayWs, { type: "remote:connected" });
         return;
       }
       send(ws, { type: "session:error", message: "Envoyez session:create ou session:join en premier" });
+      return;
+    }
+
+    if (role === "display" && msg.type === "state" && msg.payload != null) {
+      const session = sessionsById.get(sessionId);
+      if (session) {
+        touchSession(sessionId);
+        session.lastState = msg.payload;
+        if (session.remoteWs && session.remoteWs.readyState === 1) {
+          send(session.remoteWs, { type: "state", payload: msg.payload });
+        }
+      }
       return;
     }
 

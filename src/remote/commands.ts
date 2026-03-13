@@ -1,4 +1,4 @@
-import type { OverlayKey, PeriodLabel, TeamKey } from "@/types/match";
+import type { OverlayKey, PeriodLabel, RemoteStateSnapshot, TeamKey } from "@/types/match";
 
 export interface ServerInfoMessage {
   type: "server_info";
@@ -42,6 +42,12 @@ export interface CommandMessage {
 
 export interface CommandAckMessage {
   type: "command:ack";
+}
+
+/** Message d’état (affichage → backend → télécommande) pour sync bidirectionnelle. */
+export interface StateMessage {
+  type: "state";
+  payload: RemoteStateSnapshot;
 }
 
 export type RemoteCommand =
@@ -142,5 +148,25 @@ export function isCommandMessage(msg: unknown): msg is CommandMessage {
     "type" in msg &&
     (msg as CommandMessage).type === "command" &&
     "payload" in msg
+  );
+}
+
+export function isStateMessage(msg: unknown): msg is StateMessage {
+  return (
+    typeof msg === "object" &&
+    msg !== null &&
+    "type" in msg &&
+    (msg as StateMessage).type === "state" &&
+    typeof (msg as StateMessage).payload === "object" &&
+    (msg as StateMessage).payload !== null
+  );
+}
+
+export function isRemoteConnectedMessage(msg: unknown): msg is RemoteConnectedMessage {
+  return (
+    typeof msg === "object" &&
+    msg !== null &&
+    "type" in msg &&
+    (msg as RemoteConnectedMessage).type === "remote:connected"
   );
 }

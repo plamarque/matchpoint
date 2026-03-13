@@ -1,11 +1,13 @@
 import { ref, watch, onUnmounted, nextTick } from "vue";
 import { useMatchStore } from "@/stores/matchStore";
 import { runRemoteCommand } from "./commandRunner";
+import type { RemoteStateSnapshot } from "@/types/match";
 import {
   isSessionCreated,
   isSessionError,
   isCommandMessage,
-  isRemoteCommand
+  isRemoteCommand,
+  isRemoteConnectedMessage
 } from "./commands";
 
 function unwrapUrl(wsUrl: unknown): string | null {
@@ -20,16 +22,25 @@ function unwrapUrl(wsUrl: unknown): string | null {
 
 export interface RemoteChannelOptions {
   onFullscreenToggle?: () => void;
+  /** Appelé quand un remote rejoint ; utilisé pour envoyer immédiatement l’état (sync bidirectionnelle). */
+  getState?: () => RemoteStateSnapshot;
 }
 
 export function useRemoteChannel(backendWsUrl: unknown, options?: RemoteChannelOptions) {
   const store = useMatchStore();
   const onFullscreenToggle = options?.onFullscreenToggle;
+  const getState = options?.getState;
   const sessionInfo = ref<{ sessionId: string; joinCode: string } | null>(null);
   const connected = ref(false);
   const error = ref<string | null>(null);
 
   let ws: WebSocket | null = null;
+
+  function sendState(snapshot: RemoteStateSnapshot) {
+    if (ws?.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: "state", payload: snapshot }));
+    }
+  }
 
   function connect(url: string) {
     if (!url || url.trim() === "") return;
@@ -56,6 +67,10 @@ export function useRemoteChannel(backendWsUrl: unknown, options?: RemoteChannelO
         if (isSessionError(data)) {
           error.value = data.message;
           sessionInfo.value = null;
+          return;
+        }
+        if (isRemoteConnectedMessage(data) && getState) {
+          sendState(getState());
           return;
         }
         if (isCommandMessage(data) && data.payload != null) {
@@ -129,5 +144,5 @@ export function useRemoteChannel(backendWsUrl: unknown, options?: RemoteChannelO
     disconnect();
   });
 
-  return { sessionInfo, connected, error, disconnect };
+  return { sessionInfo, connected, error, disconnect, sendState };
 }

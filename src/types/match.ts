@@ -134,3 +134,26 @@ export interface StorageSchemaV1 {
   /** État complet du match (titre, scores, timers, période, overlay) pour restauration après refresh. */
   match?: PersistedMatchSnapshot;
 }
+
+/** Snapshot sérialisable pour sync télécommande : même structure que PersistedMatchSnapshot + isRunning pour les deux chronos. */
+export interface RemoteStateSnapshot {
+  periodLabel: PeriodLabel;
+  periodIndex: number;
+  teamA: TeamState;
+  teamB: TeamState;
+  impro: {
+    theme: string;
+    category: string;
+    type: "mixte" | "comparee" | "none";
+    presetSeconds: number;
+    remainingSeconds: number;
+    isRunning: boolean;
+  };
+  periodTimer: {
+    presetSeconds: number;
+    remainingSeconds: number;
+    isRunning: boolean;
+  };
+  overlay: OverlayState;
+  status: MatchStatus;
+}

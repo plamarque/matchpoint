@@ -6,6 +6,7 @@ import InlineEditableText from "@/components/InlineEditableText.vue";
 import HotspotLayer from "@/features/display/HotspotLayer.vue";
 import OverlayPanel from "@/features/overlay/OverlayPanel.vue";
 import RemoteControlQR from "@/features/display/RemoteControlQR.vue";
+import { buildSnapshot } from "@/remote/stateSnapshot";
 import { useRemoteChannel } from "@/remote/useRemoteChannel";
 import { formatClock, parseClock } from "@/services/timerService";
 import { useMatchStore } from "@/stores/matchStore";
@@ -27,15 +28,51 @@ const triggerFullscreen = async () => {
 };
 
 let sessionInfo: Ref<{ sessionId: string; joinCode: string } | null>;
+let channel: ReturnType<typeof useRemoteChannel> | undefined;
 try {
-  const channel = useRemoteChannel(computed(() => remoteBackendUrl), {
-    onFullscreenToggle: triggerFullscreen
+  channel = useRemoteChannel(computed(() => remoteBackendUrl), {
+    onFullscreenToggle: triggerFullscreen,
+    getState: () => buildSnapshot(store)
   });
   sessionInfo = channel.sessionInfo;
 } catch (e) {
   console.error("[Matchpoint] useRemoteChannel:", e);
   sessionInfo = ref(null);
 }
+
+const STATE_SYNC_THROTTLE_MS = 1000;
+let lastStateSyncAt = 0;
+let pendingStateSyncTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function pushStateToRemote() {
+  if (!channel?.sendState) return;
+  lastStateSyncAt = Date.now();
+  channel.sendState(buildSnapshot(store));
+}
+
+watch(
+  () => match.value,
+  () => {
+    if (!channel?.sendState) return;
+    const now = Date.now();
+    const elapsed = now - lastStateSyncAt;
+    if (elapsed >= STATE_SYNC_THROTTLE_MS) {
+      if (pendingStateSyncTimeout != null) {
+        clearTimeout(pendingStateSyncTimeout);
+        pendingStateSyncTimeout = null;
+      }
+      pushStateToRemote();
+      return;
+    }
+    if (pendingStateSyncTimeout == null) {
+      pendingStateSyncTimeout = setTimeout(() => {
+        pendingStateSyncTimeout = null;
+        pushStateToRemote();
+      }, STATE_SYNC_THROTTLE_MS - elapsed);
+    }
+  },
+  { deep: true }
+);
 
 const syncContrastToDocument = () => {
   const isHigh = match.value.ui.contrastMode === "high";
@@ -205,6 +242,10 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  if (pendingStateSyncTimeout != null) {
+    clearTimeout(pendingStateSyncTimeout);
+    pendingStateSyncTimeout = null;
+  }
   document.removeEventListener("fullscreenchange", updateFullscreenState);
   document.documentElement.classList.remove("contrast-high");
   void store.persist();
