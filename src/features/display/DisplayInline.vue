@@ -199,7 +199,6 @@ onUnmounted(() => {
         class-name="title-inline"
         :model-value="match.impro.theme"
         placeholder="Titre de l'improvisation"
-        multiline
         @update:model-value="store.setTheme"
       />
       <div class="category-type-line">
