@@ -498,6 +498,11 @@ body,
   margin-top: 0.35rem;
   margin-bottom: 0.2rem;
   z-index: 15;
+  pointer-events: none;
+}
+
+.overlay-hotbar-inline .overlay-icon-btn {
+  pointer-events: auto;
 }
 
 .overlay-icon {
