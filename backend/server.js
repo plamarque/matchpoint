@@ -10,8 +10,19 @@
 import { createServer } from "http";
 import { WebSocketServer } from "ws";
 import { randomBytes } from "crypto";
+import { networkInterfaces } from "os";
 
 const PORT = parseInt(process.env.PORT || "8080", 10);
+
+function getLocalIP() {
+  const nets = networkInterfaces();
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name]) {
+      if (net.family === "IPv4" && !net.internal) return net.address;
+    }
+  }
+  return "127.0.0.1";
+}
 const SESSION_TIMEOUT_MS = parseInt(process.env.SESSION_TIMEOUT_MS || "1800000", 10); // 30 min
 
 function generateId() {
@@ -166,5 +177,9 @@ function send(ws, obj) {
 }
 
 server.listen(PORT, "0.0.0.0", () => {
+  const lan = getLocalIP();
   console.log(`Matchpoint remote backend: port ${PORT}`);
+  if (lan !== "127.0.0.1") {
+    console.log(`  → Réseau local : ws://${lan}:${PORT} (à mettre dans .env : VITE_REMOTE_BACKEND_WS_URL=ws://${lan}:${PORT})`);
+  }
 });

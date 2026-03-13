@@ -1,6 +1,7 @@
 # Référence pour déploiement Cloud Run (optionnel).
 # Déploiement recommandé : gcloud run deploy --source . (depuis backend/)
-# Ce fichier peut servir pour : gcloud run services replace service.yaml
+# WebSocket : pas de config spécifique ; garder request-timeout élevé (ex. 3600 s)
+# et ne pas activer HTTP/2 end-to-end sur le service.
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:

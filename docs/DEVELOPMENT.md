@@ -17,8 +17,8 @@ npm install
 
 | Commande | Rôle |
 |----------|------|
-| `npm run dev` | Serveur Vite (frontend seul). |
-| `npm start` | Alias pratique : lance `scripts/start-dev.sh` (Vite seul). |
+| `npm run dev` | Serveur Vite seul (pas de backend). |
+| **`npm start`** | **Lance tout** : backend télécommande (8080) + Vite. Un seul script pour le dev avec télécommande. |
 | `npm run build` | Build production (frontend). |
 | `npm run preview` | Prévisualiser le build (Vite seul). |
 | `npm run backend` | Backend de télécommande (port 8080) — à lancer en parallèle si vous testez la télécommande en local. |
@@ -68,8 +68,18 @@ La télécommande repose sur un **backend WebSocket distant** (pas de serveur à
 
 **Test en local (avec backend local)** :
 
-- Terminal 1 : `npm run backend`
-- Terminal 2 : créer `.env` avec `VITE_REMOTE_BACKEND_WS_URL=ws://localhost:8080`, puis `npm run dev` (ou `npm run build` puis définir la même variable et `npm run preview` ; ou utiliser `./scripts/start-preview-with-remote.sh` après un build avec cette variable).
+- Créer un `.env` avec `VITE_REMOTE_BACKEND_WS_URL=ws://localhost:8080` (ou `ws://<IP>:8080` pour accès depuis le réseau).
+- Lancer **`npm start`** : le script `start-dev.sh` démarre le backend (port 8080) puis Vite ; tout tourne dans le même terminal.
+
+**Test en local sur le réseau (accès par IP, ex. téléphone)** :
+
+Le backend écoute sur toutes les interfaces (`0.0.0.0`). Avec **`npm start`**, backend et Vite sont lancés ensemble. Pour accéder depuis un téléphone sur le même Wi‑Fi :
+
+1. Lancer **`npm start`**. Au démarrage du backend, la console affiche l’URL LAN (ex. `ws://192.168.1.10:8080`).
+2. Dans `.env`, mettre **l’IP de la machine** (pas `localhost`) : `VITE_REMOTE_BACKEND_WS_URL=ws://192.168.1.10:8080`, puis relancer `npm start` (les variables VITE sont lues au démarrage de Vite).
+3. Sur l’ordi : ouvrir `http://192.168.1.10:5173/`. Sur le téléphone : ouvrir la même URL pour `/control` ou `/remote` ; il se connectera au backend via l’IP.
+
+Si vous changez d’IP (autre réseau), adapter `VITE_REMOTE_BACKEND_WS_URL` dans `.env` et relancer.
 
 ## Backend de télécommande (Cloud Run)
 
@@ -109,7 +119,11 @@ Le backend est dans `backend/`. Il gère des sessions temporaires en mémoire (d
 
 3. Récupérer l’URL du service (ex. `https://matchpoint-remote-xxx-xx.a.run.app`) et utiliser en **WSS** pour la variable frontend : `wss://matchpoint-remote-xxx-xx.a.run.app` (Cloud Run gère HTTP/HTTPS ; les clients WebSocket se connectent en WSS à cette URL).
 
-4. **Timeout** : pour des connexions WebSocket longues, augmenter le timeout de la requête (ex. 3600 s) via l’interface Cloud Run ou le fichier `backend/service.yaml` (annotation `run.googleapis.com/request-timeout`).
+4. **WebSocket sur Cloud Run** : aucune option à activer pour « exposer » le WebSocket (Cloud Run gère l’upgrade HTTP). En revanche :
+   - **Request timeout** : les connexions WebSocket sont des requêtes HTTP longues, limitées par le timeout du service (défaut 5 min, max 60 min). Le `service.yaml` fixe `run.googleapis.com/request-timeout: "3600"` (1 h). À conserver ou à définir au déploiement (`--timeout=3600`).
+   - **Ne pas activer HTTP/2 de bout en bout** : en cas d’activation d’HTTP/2 sur le service, les WebSockets peuvent ne pas fonctionner correctement ; laisser le défaut (HTTP/1.1 pour l’upgrade WebSocket).
+   - **Session affinity** (optionnel) : peut aider les reconnexions à tomber sur la même instance ; best-effort uniquement.
+   - En CLI : `gcloud run deploy matchpoint-remote --source . --region REGION --allow-unauthenticated --timeout=3600`
 
 ### Limites V1
 
