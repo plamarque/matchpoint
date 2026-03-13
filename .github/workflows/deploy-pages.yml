@@ -37,6 +37,7 @@ jobs:
         run: npm run build
         env:
           BASE_PATH: /matchpoint/
+          VITE_REMOTE_BACKEND_WS_URL: ${{ secrets.VITE_REMOTE_BACKEND_WS_URL }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
