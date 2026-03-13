@@ -20,7 +20,8 @@ export default defineConfig({
         theme_color: "#081724",
         background_color: "#081724",
         display: "standalone",
-        orientation: "landscape",
+        // Pas d'orientation forcée : l'affichage peut rester en paysage (écran/projecteur),
+        // la télécommande (/control, /remote) reste utilisable en portrait sur téléphone.
         start_url: base,
         scope: base,
         lang: "fr",
