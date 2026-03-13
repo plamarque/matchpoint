@@ -536,6 +536,37 @@ body,
   transform: scale(1.01);
 }
 
+/* Contraste / Plein écran : icône semi-transparente, libellé en dessous au hover (comme overlay-icon-btn) */
+/* Ne pas mettre position: relative ici : ça écraserait le position: absolute du .ghost-hotspot et désalignerait les boutons. */
+.ghost-hotspot--icon-label .ghost-icon {
+  font-size: 1.2rem;
+  opacity: inherit;
+}
+
+.ghost-hotspot--icon-label::after {
+  content: attr(data-label);
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  background: rgb(2 8 15 / 88%);
+  color: #e9f2fb;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease;
+}
+
+.ghost-hotspot--icon-label:hover::after,
+.ghost-hotspot--icon-label:focus-visible::after {
+  opacity: 1;
+}
+
 /* Boutons play/pause et reset dans les cartes timer : rester dans le flux et bien visibles */
 .timer-card .ghost-hotspot.timer-action-btn,
 .timer-card .ghost-hotspot.arrow-btn {

@@ -20,8 +20,14 @@ const hotspotSymbol = (action: string): string => {
   if (action === "period_next") return "→";
   if (action.includes("penalty_up")) return "+";
   if (action.includes("penalty_down")) return "-";
+  if (action === "fullscreen_toggle") return "⛶";
+  if (action === "contrast_toggle") return "◐";
   return "";
 };
+
+/** Icône seule avec libellé au hover (comme overlay-icon-btn) */
+const isIconLabelHotspot = (action: string): boolean =>
+  action === "fullscreen_toggle" || action === "contrast_toggle";
 </script>
 
 <template>
@@ -40,7 +46,8 @@ const hotspotSymbol = (action: string): string => {
       :class="{
         circle: spot.shape === 'circle',
         'score-control': String(spot.action).startsWith('score_'),
-        'center-y': spot.centerY
+        'center-y': spot.centerY,
+        'ghost-hotspot--icon-label': isIconLabelHotspot(String(spot.action))
       }"
       :style="{
         left: `${spot.x}%`,
@@ -50,9 +57,10 @@ const hotspotSymbol = (action: string): string => {
       }"
       :aria-label="spot.label"
       :title="spot.label"
+      :data-label="isIconLabelHotspot(String(spot.action)) ? spot.label : undefined"
       @click="emit('action', String(spot.action))"
     >
-      <span class="ghost-label">
+      <span class="ghost-label" :class="{ 'ghost-icon': isIconLabelHotspot(String(spot.action)) }">
         {{ hotspotSymbol(String(spot.action)) || spot.label }}
       </span>
     </button>
