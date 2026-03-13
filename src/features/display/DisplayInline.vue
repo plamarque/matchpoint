@@ -156,7 +156,9 @@ useKeyboardShortcuts((event) => {
     return;
   }
 
-  if (key === "escape") {
+  // Escape ferme l’overlay mais en fullscreen le navigateur quitte aussi le plein écran.
+  // Backspace ferme uniquement l’overlay (à utiliser en fullscreen).
+  if (key === "escape" || key === "backspace") {
     store.clearOverlay();
     return;
   }
