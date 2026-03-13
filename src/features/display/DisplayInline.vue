@@ -74,6 +74,13 @@ watch(
   { deep: true }
 );
 
+watch(
+  () => store.showRemoteQrModal,
+  () => {
+    if (channel?.sendState) pushStateToRemote();
+  }
+);
+
 const syncContrastToDocument = () => {
   const isHigh = match.value.ui.contrastMode === "high";
   document.documentElement.classList.toggle("contrast-high", isHigh);

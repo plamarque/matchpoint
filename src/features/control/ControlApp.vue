@@ -16,6 +16,9 @@ const connectError = ref<string | null>(null);
 /** Overlay actuellement affiché (pour effet bouton poussoir, suivi local). */
 const activeOverlayKey = ref<OverlayKey | null>(null);
 
+/** Modal QR affichée sur l’écran (pour effet bouton poussoir sur le bouton QR). */
+const qrVisible = ref(false);
+
 /** État local affiché (scores, noms, couleurs, fautes) — mis à jour à chaque envoi de commande. */
 const scoreA = ref(0);
 const scoreB = ref(0);
@@ -342,6 +345,10 @@ function applyState(payload: RemoteStateSnapshot) {
 
   const ov = payload.overlay;
   activeOverlayKey.value = (ov?.activeOverlay ?? null) as OverlayKey | null;
+
+  if (payload.showRemoteQrModal !== undefined) {
+    qrVisible.value = payload.showRemoteQrModal;
+  }
 }
 
 function parseQueryParams() {
@@ -798,7 +805,7 @@ function onCustomAnnounceButtonClick() {
         <section class="control-section">
           <div class="control-row">
             <button type="button" class="control-btn" @click="send({ type: 'contrast_toggle' })">Contraste</button>
-            <button type="button" class="control-btn" @click="send({ type: 'qr_toggle' })">QR</button>
+            <button type="button" class="control-btn" :class="{ primary: qrVisible }" @click="send({ type: 'qr_toggle' })">QR</button>
             <button type="button" class="control-btn danger" @click="resetMatch">Reset match</button>
           </div>
         </section>
@@ -1020,7 +1027,7 @@ function onCustomAnnounceButtonClick() {
 
 .control-period-current {
   font-weight: 600;
-  color: var(--text-main);
+  color: var(--accent);
   margin-left: 0.25rem;
 }
 
@@ -1056,7 +1063,7 @@ function onCustomAnnounceButtonClick() {
   font-weight: 600;
   min-width: 3rem;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--accent);
 }
 
 .control-timer-row {

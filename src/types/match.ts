@@ -156,4 +156,6 @@ export interface RemoteStateSnapshot {
   };
   overlay: OverlayState;
   status: MatchStatus;
+  /** Modal QR affichée sur l’écran d’affichage (pour bouton poussoir sur la télécommande). */
+  showRemoteQrModal?: boolean;
 }

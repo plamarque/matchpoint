@@ -6,8 +6,17 @@ import type { MatchState } from "@/types/match";
  * Construit un snapshot sérialisable de l'état du match pour la synchronisation
  * avec la télécommande (affichage → backend → remote).
  */
-export function buildSnapshot(store: { match: MatchState | { value: MatchState } }): RemoteStateSnapshot {
+export function buildSnapshot(store: {
+  match: MatchState | { value: MatchState };
+  showRemoteQrModal?: { value: boolean } | boolean;
+}): RemoteStateSnapshot {
   const m = isRef(store.match) ? store.match.value : store.match;
+  const qr =
+    store.showRemoteQrModal === undefined
+      ? undefined
+      : typeof store.showRemoteQrModal === "object" && "value" in store.showRemoteQrModal
+        ? store.showRemoteQrModal.value
+        : Boolean(store.showRemoteQrModal);
   return {
     periodLabel: m.periodLabel,
     periodIndex: m.periodIndex,
@@ -27,6 +36,7 @@ export function buildSnapshot(store: { match: MatchState | { value: MatchState }
       isRunning: m.periodTimer.startedAt !== null
     },
     overlay: { ...m.overlay },
-    status: m.status
+    status: m.status,
+    showRemoteQrModal: qr
   };
 }
