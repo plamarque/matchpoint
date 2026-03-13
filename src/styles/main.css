@@ -125,7 +125,7 @@ body,
 .category-inline {
   margin: 0;
   color: var(--text-muted);
-  font-size: clamp(1.8rem, 3.2vw, 3.6rem);
+  font-size: clamp(2.2rem, 4vw, 4.4rem);
   flex: 1 1 auto;
   min-width: 0;
   position: relative;
@@ -754,7 +754,7 @@ html.contrast-high {
 
   .score-column-category,
   .score-column-type {
-    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
     text-align: center;
   }
 
@@ -796,12 +796,12 @@ html.contrast-high {
   .category-type-line,
   .category-inline,
   .impro-type-inline {
-    font-size: clamp(0.95rem, 1.8vw, 1.5rem);
+    font-size: clamp(1.15rem, 2.2vw, 1.8rem);
   }
 
   .score-column-category,
   .score-column-type {
-    font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
   }
 
   .inline-grid {
