@@ -6,6 +6,44 @@ export interface ServerInfoMessage {
   port: number;
 }
 
+/** Messages du protocole session (backend distant) */
+export interface SessionCreatedMessage {
+  type: "session:created";
+  sessionId: string;
+  joinCode: string;
+}
+
+export interface SessionJoinMessage {
+  type: "session:join";
+  joinCode: string;
+}
+
+export interface SessionJoinedMessage {
+  type: "session:joined";
+}
+
+export interface SessionErrorMessage {
+  type: "session:error";
+  message: string;
+}
+
+export interface RemoteConnectedMessage {
+  type: "remote:connected";
+}
+
+export interface RemoteDisconnectedMessage {
+  type: "remote:disconnected";
+}
+
+export interface CommandMessage {
+  type: "command";
+  payload: RemoteCommand;
+}
+
+export interface CommandAckMessage {
+  type: "command:ack";
+}
+
 export type RemoteCommand =
   | { type: "score_up"; team: TeamKey }
   | { type: "score_down"; team: TeamKey }
@@ -63,4 +101,44 @@ export function isRemoteCommand(msg: unknown): msg is RemoteCommand {
   if (typeof msg !== "object" || msg === null || !("type" in msg)) return false;
   const t = (msg as RemoteCommand).type;
   return typeof t === "string" && t.length > 0;
+}
+
+export function isSessionCreated(msg: unknown): msg is SessionCreatedMessage {
+  return (
+    typeof msg === "object" &&
+    msg !== null &&
+    "type" in msg &&
+    (msg as SessionCreatedMessage).type === "session:created" &&
+    typeof (msg as SessionCreatedMessage).sessionId === "string" &&
+    typeof (msg as SessionCreatedMessage).joinCode === "string"
+  );
+}
+
+export function isSessionError(msg: unknown): msg is SessionErrorMessage {
+  return (
+    typeof msg === "object" &&
+    msg !== null &&
+    "type" in msg &&
+    (msg as SessionErrorMessage).type === "session:error" &&
+    typeof (msg as SessionErrorMessage).message === "string"
+  );
+}
+
+export function isSessionJoinedMessage(msg: unknown): msg is SessionJoinedMessage {
+  return (
+    typeof msg === "object" &&
+    msg !== null &&
+    "type" in msg &&
+    (msg as SessionJoinedMessage).type === "session:joined"
+  );
+}
+
+export function isCommandMessage(msg: unknown): msg is CommandMessage {
+  return (
+    typeof msg === "object" &&
+    msg !== null &&
+    "type" in msg &&
+    (msg as CommandMessage).type === "command" &&
+    "payload" in msg
+  );
 }

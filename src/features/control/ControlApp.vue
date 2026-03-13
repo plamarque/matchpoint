@@ -1,60 +1,68 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import type { RemoteCommand } from "@/remote/commands";
-import { getDisplayWsUrl } from "@/remote/useRemoteChannel";
+import { isSessionJoinedMessage, isSessionError } from "@/remote/commands";
 import { OVERLAY_LABELS } from "@/constants/match";
 import type { OverlayKey } from "@/types/match";
 import { IMPRO_TIME_PRESETS_SECONDS, PERIOD_TIME_PRESETS_SECONDS } from "@/constants/match";
 
-const host = ref("");
-const port = ref(8765);
+const backendWsUrl = (import.meta.env as { VITE_REMOTE_BACKEND_WS_URL?: string }).VITE_REMOTE_BACKEND_WS_URL ?? "";
+const code = ref("");
 const ws = ref<WebSocket | null>(null);
 const connected = ref(false);
 const connectError = ref<string | null>(null);
 
-const controlUrl = computed(() => {
-  if (!host.value.trim()) return null;
-  return getDisplayWsUrl(host.value.trim(), port.value);
-});
-
 function parseQueryParams() {
   const params = new URLSearchParams(location.search);
-  const h = params.get("host");
-  const p = params.get("port");
-  if (h) host.value = h;
-  if (p) {
-    const n = parseInt(p, 10);
-    if (!Number.isNaN(n)) port.value = n;
-  }
+  const c = params.get("code");
+  if (c) code.value = c.trim();
 }
 
 onMounted(() => {
   parseQueryParams();
-  if (host.value.trim() && port.value > 0) {
+  if (code.value && backendWsUrl) {
     connect();
   }
 });
 
 function connect() {
-  const url = controlUrl.value;
-  if (!url) {
-    connectError.value = "Indiquez l’adresse de l’affichage";
+  const joinCode = code.value.trim().toUpperCase();
+  if (!joinCode) {
+    connectError.value = "Saisissez le code affiché sur l’écran d’affichage";
+    return;
+  }
+  if (!backendWsUrl) {
+    connectError.value = "La télécommande n’est pas configurée.";
     return;
   }
   connectError.value = null;
   try {
-    const socket = new WebSocket(url);
+    const socket = new WebSocket(backendWsUrl);
     ws.value = socket;
     socket.onopen = () => {
-      connected.value = true;
-      connectError.value = null;
+      socket.send(JSON.stringify({ type: "session:join", joinCode }));
+    };
+    socket.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data as string) as unknown;
+        if (isSessionJoinedMessage(data)) {
+          connected.value = true;
+          connectError.value = null;
+          return;
+        }
+        if (isSessionError(data)) {
+          connectError.value = data.message;
+        }
+      } catch {
+        // ignore
+      }
     };
     socket.onclose = () => {
       connected.value = false;
       ws.value = null;
     };
     socket.onerror = () => {
-      connectError.value = "Connexion impossible. Même Wi‑Fi ?";
+      connectError.value = "Vérifiez le code ou la connexion Internet.";
     };
   } catch (e) {
     connectError.value = e instanceof Error ? e.message : "Erreur";
@@ -63,7 +71,7 @@ function connect() {
 
 function send(cmd: RemoteCommand) {
   if (ws.value?.readyState === WebSocket.OPEN) {
-    ws.value.send(JSON.stringify(cmd));
+    ws.value.send(JSON.stringify({ type: "command", payload: cmd }));
   }
 }
 
@@ -92,19 +100,15 @@ function overlayIcon(key: string): string {
       <section class="control-connect">
         <h1>Matchpoint — Contrôle</h1>
         <p class="control-connect-hint">
-          Connectez-vous au même Wi‑Fi que l’ordinateur d’affichage (ou partage de connexion), puis saisissez son adresse.
+          Scannez le QR code affiché sur l’écran d’affichage, ou saisissez le code de session.
         </p>
         <form class="control-connect-form" @submit.prevent="connect">
           <label>
-            <span>Adresse (IP)</span>
-            <input v-model="host" type="text" placeholder="192.168.1.10" inputmode="numeric" autocomplete="off" />
-          </label>
-          <label>
-            <span>Port</span>
-            <input v-model.number="port" type="number" min="1" max="65535" />
+            <span>Code de session</span>
+            <input v-model="code" type="text" placeholder="ABC123" inputmode="text" autocomplete="off" maxlength="12" />
           </label>
           <p v-if="connectError" class="control-connect-error">{{ connectError }}</p>
-          <button type="submit" class="control-connect-btn">Se connecter</button>
+          <button type="submit" class="control-connect-btn">Rejoindre</button>
         </form>
       </section>
     </template>

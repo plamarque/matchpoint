@@ -15,6 +15,7 @@ V1 inline-only implémentée (refonte UX type Gazoo).
 | 2 | Tableau d’affichage | Fait |
 | 3 | Contrôle inline fantôme | Fait |
 | 4 | Tests + docs normatives | Fait |
+| 5 | Télécommande distante (backend Cloud Run) | Fait |
 
 ## Tâches
 
@@ -24,3 +25,4 @@ V1 inline-only implémentée (refonte UX type Gazoo).
 - [x] Implémenter barre d’annonces fantômes
 - [x] Adapter tests unitaires/intégration/e2e
 - [x] Mettre à jour SPEC/DOMAIN/ARCH + ADR
+- [x] Télécommande : backend WebSocket distant (sessions, QR par code), déploiement Cloud Run

@@ -13,7 +13,7 @@ La V1 fournit un pilotage **100% inline**: toutes les modifications se font dire
 - 9 annonces overlays fixes type Gazoo, déclenchées depuis une barre d’icônes.
 - PWA installable, mode offline après premier chargement.
 
-- **Contrôle à distance (optionnel)** : un bouton discret sur l’affichage ouvre un QR code ; le téléphone (même Wi‑Fi ou partage de connexion) peut ouvrir l’app de contrôle (`/control`) et piloter l’affichage via WebSocket. Pas d’app à installer à l’avance (scan = ouverture en ligne ou PWA déjà installée).
+- **Contrôle à distance (optionnel)** : un bouton discret sur l’affichage ouvre un QR code (affiché seulement si une session distante a été créée avec succès) ; le téléphone peut ouvrir l’app de contrôle (`/control` ou `/remote`) et rejoindre la session via un code pour piloter l’affichage. Pas d’app à installer à l’avance (scan = ouverture en ligne ou PWA déjà installée). En l’absence de backend ou d’Internet, la télécommande est indisponible sans bloquer le reste de l’application.
 
 ## Hors périmètre V1
 

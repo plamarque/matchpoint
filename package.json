@@ -8,7 +8,7 @@
     "dev": "vite --host",
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
-    "server": "node server/ws-server.js",
+    "backend": "node backend/server.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",

@@ -6,21 +6,20 @@ import InlineEditableText from "@/components/InlineEditableText.vue";
 import HotspotLayer from "@/features/display/HotspotLayer.vue";
 import OverlayPanel from "@/features/overlay/OverlayPanel.vue";
 import RemoteControlQR from "@/features/display/RemoteControlQR.vue";
-import { getDisplayWsUrl } from "@/remote/useRemoteChannel";
 import { useRemoteChannel } from "@/remote/useRemoteChannel";
 import { formatClock, parseClock } from "@/services/timerService";
 import { useMatchStore } from "@/stores/matchStore";
 import type { HotspotDefinition, OverlayKey } from "@/types/match";
 import { useKeyboardShortcuts } from "@/utils/useKeyboardShortcuts";
 
-const REMOTE_WS_PORT = 8765;
-let serverInfo: Ref<{ host: string; port: number } | null>;
+const remoteBackendUrl = (import.meta.env as { VITE_REMOTE_BACKEND_WS_URL?: string }).VITE_REMOTE_BACKEND_WS_URL ?? "";
+let sessionInfo: Ref<{ sessionId: string; joinCode: string } | null>;
 try {
-  const channel = useRemoteChannel(computed(() => getDisplayWsUrl("localhost", REMOTE_WS_PORT)));
-  serverInfo = channel.serverInfo;
+  const channel = useRemoteChannel(computed(() => remoteBackendUrl));
+  sessionInfo = channel.sessionInfo;
 } catch (e) {
   console.error("[Matchpoint] useRemoteChannel:", e);
-  serverInfo = ref(null);
+  sessionInfo = ref(null);
 }
 
 const store = useMatchStore();
@@ -512,7 +511,7 @@ onUnmounted(() => {
     />
 
     <RemoteControlQR
-      :server-info="serverInfo"
+      :session-info="sessionInfo"
       :idle-opacity="match.ui.ghostIdleOpacity"
       :hover-opacity="match.ui.ghostHoverOpacity"
       :hotspot-scale="match.ui.hotspotScale"

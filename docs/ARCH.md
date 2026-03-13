@@ -3,13 +3,13 @@
 ## Vue d’ensemble V1
 
 - SPA Vue 3 + TypeScript, store Pinia unique.
-- Routes: `/` (affichage), `/control` (app de contrôle mobile, optionnelle).
+- Routes: `/` (affichage), `/control` et `/remote` (app de contrôle mobile, optionnelle).
 - Pilotage inline sur l’affichage et, optionnellement, à distance via:
   - `InlineEditableText` (édition in-place)
   - contrôles fantômes inline (boutons semi-transparents intégrés dans les blocs visuels)
   - `HotspotLayer` pour actions globales projet (période, fullscreen, contraste)
 - PWA offline/installable via Workbox.
-- **Contrôle à distance** : serveur WebSocket léger (`npm run server`, port 8765) sur la machine d’affichage ; l’affichage se connecte en `ws://localhost:8765`, reçoit `server_info` (IP, port) et affiche un QR code pointant vers `/control?host=&port=`. Le téléphone ouvre l’app (en ligne ou PWA), se connecte au même serveur et envoie des commandes JSON ; le serveur relaie vers l’affichage ; `commandRunner` applique les commandes au store. Même Wi‑Fi (ou partage de connexion) requis.
+- **Contrôle à distance** : backend WebSocket distant (déployable sur Google Cloud Run). L’affichage se connecte au backend (URL via `VITE_REMOTE_BACKEND_WS_URL`), crée une session et reçoit un code ; le QR code pointe vers `/control?code=`. Le téléphone ouvre l’app (en ligne ou PWA), rejoint la session avec le code et envoie des commandes ; le backend relaie vers l’affichage ; `commandRunner` applique les commandes au store. Sans backend ou sans Internet, la télécommande est indisponible (message générique), le pilotage local reste intact.
 
 ## Composants clés
 

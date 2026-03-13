@@ -5,7 +5,7 @@ import { buildControlAppUrl } from "@/remote/controlAppUrl";
 
 const props = withDefaults(
   defineProps<{
-    serverInfo: { host: string; port: number } | null;
+    sessionInfo: { joinCode: string } | null;
     idleOpacity?: number;
     hoverOpacity?: number;
     hotspotScale?: number;
@@ -17,24 +17,18 @@ const showModal = ref(false);
 const qrDataUrl = ref<string | null>(null);
 
 const controlUrl = computed(() => {
-  if (!props.serverInfo) return null;
-  const appOrigin = import.meta.env.DEV
-    ? `http://${props.serverInfo.host}:${typeof location !== "undefined" ? location.port : "5173"}`
-    : undefined;
-  return buildControlAppUrl(props.serverInfo.host, props.serverInfo.port, appOrigin);
+  if (!props.sessionInfo) return null;
+  return buildControlAppUrl(props.sessionInfo.joinCode);
 });
 
 watch(
-  () => props.serverInfo,
+  () => props.sessionInfo,
   async (info) => {
     if (!info) {
       qrDataUrl.value = null;
       return;
     }
-    const appOrigin = import.meta.env.DEV
-      ? `http://${info.host}:${typeof location !== "undefined" ? location.port : "5173"}`
-      : undefined;
-    const url = buildControlAppUrl(info.host, info.port, appOrigin);
+    const url = buildControlAppUrl(info.joinCode);
     try {
       qrDataUrl.value = await QRCode.toDataURL(url, { width: 280, margin: 2 });
     } catch {
@@ -65,36 +59,36 @@ function closeModal() {
     <button
       type="button"
       class="ghost-hotspot"
-      :aria-label="serverInfo ? 'Contrôle par smartphone' : 'Lancez le serveur (npm run server) pour afficher le QR'"
-      :title="serverInfo ? 'Scannez pour piloter depuis votre téléphone' : 'Lancez le serveur (npm run server) pour afficher le QR'"
+      :aria-label="sessionInfo ? 'Contrôle par smartphone' : 'Télécommande indisponible'"
+      :title="sessionInfo ? 'Scannez pour piloter depuis votre téléphone' : 'La télécommande n’est pas disponible sans connexion Internet'"
       @click="openModal"
     >
       <span class="ghost-label">QR</span>
     </button>
   </div>
 
-    <Teleport to="body">
-      <Transition name="modal">
-        <div v-if="showModal" class="remote-modal-backdrop" @click.self="closeModal">
-          <div class="remote-modal" role="dialog" aria-labelledby="remote-modal-title" aria-modal="true">
-            <h2 id="remote-modal-title" class="remote-modal-title">Contrôle par smartphone</h2>
-            <p v-if="serverInfo" class="remote-modal-hint">Scannez pour ouvrir l’appli de contrôle sur votre téléphone.</p>
-            <p v-else class="remote-modal-hint remote-modal-warn">
-              Le serveur de contrôle (Node) n’est pas démarré. Lancez l’app avec <code>npm start</code> pour tout démarrer en une fois, ou dans un autre terminal : <code>npm run server</code>, puis rechargez cette page.
-            </p>
-            <div v-if="qrDataUrl" class="remote-modal-qr">
-              <img :src="qrDataUrl" alt="QR code de connexion" width="280" height="280" />
-            </div>
-            <p v-if="controlUrl" class="remote-modal-url">
-              <a :href="controlUrl" target="_blank" rel="noopener">{{ controlUrl }}</a>
-            </p>
-            <button type="button" class="remote-modal-close" aria-label="Fermer" @click="closeModal">
-              Fermer
-            </button>
+  <Teleport to="body">
+    <Transition name="modal">
+      <div v-if="showModal" class="remote-modal-backdrop" @click.self="closeModal">
+        <div class="remote-modal" role="dialog" aria-labelledby="remote-modal-title" aria-modal="true">
+          <h2 id="remote-modal-title" class="remote-modal-title">Contrôle par smartphone</h2>
+          <p v-if="sessionInfo" class="remote-modal-hint">Scannez pour ouvrir l’appli de contrôle sur votre téléphone.</p>
+          <p v-else class="remote-modal-hint remote-modal-warn">
+            La télécommande n’est pas disponible sans connexion Internet.
+          </p>
+          <div v-if="qrDataUrl" class="remote-modal-qr">
+            <img :src="qrDataUrl" alt="QR code de connexion" width="280" height="280" />
           </div>
+          <p v-if="controlUrl" class="remote-modal-url">
+            <a :href="controlUrl" target="_blank" rel="noopener">{{ controlUrl }}</a>
+          </p>
+          <button type="button" class="remote-modal-close" aria-label="Fermer" @click="closeModal">
+            Fermer
+          </button>
         </div>
-      </Transition>
-    </Teleport>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped>

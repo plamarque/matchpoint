@@ -1,9 +1,12 @@
 import { ref, watch, onUnmounted, nextTick } from "vue";
 import { useMatchStore } from "@/stores/matchStore";
 import { runRemoteCommand } from "./commandRunner";
-import { isServerInfo, isRemoteCommand } from "./commands";
-
-const DEFAULT_WS_PORT = 8765;
+import {
+  isSessionCreated,
+  isSessionError,
+  isCommandMessage,
+  isRemoteCommand
+} from "./commands";
 
 function unwrapUrl(wsUrl: unknown): string | null {
   if (wsUrl == null) return null;
@@ -15,24 +18,13 @@ function unwrapUrl(wsUrl: unknown): string | null {
   return typeof wsUrl === "string" ? wsUrl : null;
 }
 
-export function getDisplayWsUrl(host: string, port = DEFAULT_WS_PORT): string {
-  if (typeof host !== "string" || !host.trim()) return "";
-  const protocol =
-    typeof location !== "undefined" && location.protocol === "https:" ? "wss:" : "ws:";
-  return `${protocol}//${host}:${port}`;
-}
-
-export function useRemoteChannel(wsUrl: unknown) {
+export function useRemoteChannel(backendWsUrl: unknown) {
   const store = useMatchStore();
-  const serverInfo = ref<{ host: string; port: number } | null>(null);
+  const sessionInfo = ref<{ sessionId: string; joinCode: string } | null>(null);
   const connected = ref(false);
   const error = ref<string | null>(null);
 
   let ws: WebSocket | null = null;
-  let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
-  let reconnectAttempts = 0;
-  const maxReconnectAttempts = 10;
-  const baseReconnectDelay = 1500;
 
   function connect(url: string) {
     if (!url || url.trim() === "") return;
@@ -40,21 +32,33 @@ export function useRemoteChannel(wsUrl: unknown) {
       ws = new WebSocket(url);
     } catch (e) {
       error.value = e instanceof Error ? e.message : "WebSocket error";
-      scheduleReconnect(url);
       return;
     }
 
     ws.onopen = () => {
-      connected.value = true;
       error.value = null;
-      reconnectAttempts = 0;
+      ws?.send(JSON.stringify({ type: "session:create" }));
     };
 
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data as string) as unknown;
-        if (isServerInfo(data)) {
-          serverInfo.value = { host: data.host, port: data.port };
+        if (isSessionCreated(data)) {
+          sessionInfo.value = { sessionId: data.sessionId, joinCode: data.joinCode };
+          connected.value = true;
+          return;
+        }
+        if (isSessionError(data)) {
+          error.value = data.message;
+          sessionInfo.value = null;
+          return;
+        }
+        if (isCommandMessage(data) && data.payload != null) {
+          try {
+            runRemoteCommand(data.payload, store);
+          } catch (err) {
+            console.warn("[Matchpoint] Commande remote ignorée:", err);
+          }
           return;
         }
         if (isRemoteCommand(data)) {
@@ -71,52 +75,26 @@ export function useRemoteChannel(wsUrl: unknown) {
 
     ws.onclose = () => {
       connected.value = false;
+      sessionInfo.value = null;
       ws = null;
-      try {
-        const urlToUse = unwrapUrl(wsUrl);
-        if (urlToUse) scheduleReconnect(urlToUse);
-      } catch {
-        // ignore
-      }
     };
 
     ws.onerror = () => {
-      error.value = "Connexion WebSocket en erreur";
+      error.value = "Connexion impossible";
     };
   }
 
-  function scheduleReconnect(url: string) {
-    if (reconnectTimeout) return;
-    if (reconnectAttempts >= maxReconnectAttempts) return;
-    const delay = Math.min(baseReconnectDelay * Math.pow(1.5, reconnectAttempts), 30000);
-    reconnectAttempts += 1;
-    reconnectTimeout = setTimeout(() => {
-      reconnectTimeout = null;
-      connect(url);
-    }, delay);
-  }
-
   function disconnect() {
-    if (reconnectTimeout) {
-      clearTimeout(reconnectTimeout);
-      reconnectTimeout = null;
-    }
     if (ws) {
       ws.close();
       ws = null;
     }
     connected.value = false;
-    serverInfo.value = null;
+    sessionInfo.value = null;
   }
 
   const stopWatch = watch(
-    () => {
-      try {
-        return unwrapUrl(wsUrl);
-      } catch {
-        return null;
-      }
-    },
+    () => unwrapUrl(backendWsUrl),
     (url) => {
       disconnect();
       if (url && typeof url === "string") {
@@ -137,5 +115,5 @@ export function useRemoteChannel(wsUrl: unknown) {
     disconnect();
   });
 
-  return { serverInfo, connected, error, disconnect };
+  return { sessionInfo, connected, error, disconnect };
 }

@@ -10,10 +10,10 @@ export const REMOTE_CONTROL_ORIGIN =
   (typeof location !== "undefined" ? `${location.origin}${basePath}` : "https://plamarque.github.io/matchpoint");
 
 /**
- * Construit l’URL de la page contrôle pour le QR code.
- * En dev, passer appOrigin (ex. http://192.168.1.10:5173) pour que le téléphone charge l’app sur l’IP du serveur.
+ * Construit l’URL de la page contrôle pour le QR code (session distante).
+ * joinCode : code retourné par le backend (session:created).
  */
-export function buildControlAppUrl(host: string, port: number, appOrigin?: string): string {
+export function buildControlAppUrl(joinCode: string, appOrigin?: string): string {
   const base = (appOrigin ?? REMOTE_CONTROL_ORIGIN).replace(/\/$/, "");
-  return `${base}/control?host=${encodeURIComponent(host)}&port=${port}`;
+  return `${base}/control?code=${encodeURIComponent(joinCode)}`;
 }
