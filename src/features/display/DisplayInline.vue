@@ -102,14 +102,6 @@ const hotspots = computed<HotspotDefinition[]>(() => [
   { id: "hotspot_contrast_toggle", label: "Contraste", action: "contrast_toggle", x: 1, y: 2, width: 6, height: 7 }
 ]);
 
-const hotspotsColorA = computed<HotspotDefinition[]>(() => [
-  { id: "hotspot_color_cycle_a", label: "Couleur A suivante", action: "color_cycle_a", x: 0.5, y: 50, width: 4.5, height: 34, centerY: true }
-]);
-
-const hotspotsColorB = computed<HotspotDefinition[]>(() => [
-  { id: "hotspot_color_cycle_b", label: "Couleur B suivante", action: "color_cycle_b", x: 95, y: 50, width: 4.5, height: 34, centerY: true }
-]);
-
 const onOverlayButtonClick = (overlayKey: string) => {
   if (overlayKey === "overlay_custom") {
     const value = window.prompt("Annonce", "ANNONCE");
@@ -277,12 +269,12 @@ onUnmounted(() => {
             @click="togglePenaltyDot('A', slot)"
           />
         </div>
-        <HotspotLayer
-          :hotspots="hotspotsColorA"
-          :idle-opacity="match.ui.ghostIdleOpacity"
-          :hover-opacity="match.ui.ghostHoverOpacity"
-          :hotspot-scale="match.ui.hotspotScale"
-          @action="applyAction"
+        <button
+          type="button"
+          class="score-color-corner score-color-corner--left"
+          aria-label="Changer la couleur de l’équipe A"
+          title="Couleur"
+          @click.stop="store.cycleTeamColor('A')"
         />
       </article>
 
@@ -480,12 +472,12 @@ onUnmounted(() => {
             @click="togglePenaltyDot('B', slot)"
           />
         </div>
-        <HotspotLayer
-          :hotspots="hotspotsColorB"
-          :idle-opacity="match.ui.ghostIdleOpacity"
-          :hover-opacity="match.ui.ghostHoverOpacity"
-          :hotspot-scale="match.ui.hotspotScale"
-          @action="applyAction"
+        <button
+          type="button"
+          class="score-color-corner score-color-corner--right"
+          aria-label="Changer la couleur de l’équipe B"
+          title="Couleur"
+          @click.stop="store.cycleTeamColor('B')"
         />
       </article>
     </section>

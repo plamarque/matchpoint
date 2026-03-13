@@ -553,14 +553,6 @@ function onCustomAnnounceButtonClick() {
           <div class="control-scores">
             <div class="control-team-block">
               <div class="control-team-head">
-                <button
-                  type="button"
-                  class="control-team-color-btn"
-                  :style="{ backgroundColor: teamColorA }"
-                  aria-label="Changer la couleur de l’équipe A"
-                  title="Couleur"
-                  @click="cycleTeamColor('A')"
-                />
                 <input
                   v-model="teamNameA"
                   type="text"
@@ -577,6 +569,13 @@ function onCustomAnnounceButtonClick() {
                     <button type="button" class="control-score-arrow" aria-label="Augmenter score" @click="sendScoreUp('A')">▲</button>
                     <button type="button" class="control-score-arrow" aria-label="Diminuer score" @click="sendScoreDown('A')">▼</button>
                   </div>
+                  <button
+                    type="button"
+                    class="control-score-color-corner control-score-color-corner--left"
+                    aria-label="Changer la couleur de l’équipe A"
+                    title="Couleur"
+                    @click.stop="cycleTeamColor('A')"
+                  />
                 </div>
                 <div class="control-penalties">
                   <button
@@ -596,14 +595,6 @@ function onCustomAnnounceButtonClick() {
             </div>
             <div class="control-team-block">
               <div class="control-team-head">
-                <button
-                  type="button"
-                  class="control-team-color-btn"
-                  :style="{ backgroundColor: teamColorB }"
-                  aria-label="Changer la couleur de l’équipe B"
-                  title="Couleur"
-                  @click="cycleTeamColor('B')"
-                />
                 <input
                   v-model="teamNameB"
                   type="text"
@@ -620,6 +611,13 @@ function onCustomAnnounceButtonClick() {
                     <button type="button" class="control-score-arrow" aria-label="Augmenter score" @click="sendScoreUp('B')">▲</button>
                     <button type="button" class="control-score-arrow" aria-label="Diminuer score" @click="sendScoreDown('B')">▼</button>
                   </div>
+                  <button
+                    type="button"
+                    class="control-score-color-corner control-score-color-corner--right"
+                    aria-label="Changer la couleur de l’équipe B"
+                    title="Couleur"
+                    @click.stop="cycleTeamColor('B')"
+                  />
                 </div>
                 <div class="control-penalties">
                   <button
@@ -1092,23 +1090,6 @@ function onCustomAnnounceButtonClick() {
   gap: 0.5rem;
 }
 
-.control-team-color-btn {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
-  border-radius: 8px;
-  border: 2px solid var(--text-muted);
-  padding: 0;
-  cursor: pointer;
-  touch-action: manipulation;
-  flex-shrink: 0;
-}
-
-.control-team-color-btn:hover {
-  filter: brightness(1.1);
-}
-
 .control-team-name-input {
   flex: 1;
   min-width: 0;
@@ -1123,6 +1104,7 @@ function onCustomAnnounceButtonClick() {
 }
 
 .control-score-stepper {
+  position: relative;
   display: flex;
   align-items: stretch;
   gap: 0;
@@ -1131,6 +1113,36 @@ function onCustomAnnounceButtonClick() {
   overflow: hidden;
   border: none;
   min-width: 5rem;
+}
+
+/* Triangle en coin pour changer la couleur — inférieur gauche (A) / inférieur droit (B) */
+.control-score-color-corner {
+  position: absolute;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  border: 0 solid transparent;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  background: none;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+}
+.control-score-color-corner:hover {
+  opacity: 1;
+}
+.control-score-color-corner--left {
+  left: 0;
+  border-bottom-width: 22px;
+  border-right-width: 22px;
+  border-bottom-color: rgba(0, 0, 0, 0.4);
+}
+.control-score-color-corner--right {
+  right: 0;
+  border-bottom-width: 22px;
+  border-left-width: 22px;
+  border-bottom-color: rgba(0, 0, 0, 0.4);
 }
 
 .control-score-value {
