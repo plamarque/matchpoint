@@ -17,6 +17,6 @@ test("match flow inline interactions", async ({ page }) => {
 
   await page.getByRole("button", { name: "Début du match" }).click();
   await expect(page.locator(".overlay-title")).toContainText("Début du match");
-  await page.locator(".overlay-panel").click();
+  await page.keyboard.press("Escape");
   await expect(page.locator(".overlay-title")).toHaveCount(0);
 });

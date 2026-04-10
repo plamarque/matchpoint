@@ -44,6 +44,22 @@ describe("matchStore", () => {
     expect(store.match.teamA.colorToken).not.toBe(current);
   });
 
+  it("sets vote card color when hex is valid", () => {
+    const store = useMatchStore();
+    store.setVoteCardColor("A", "#ff00aa");
+    expect(store.match.teamA.voteCardColor).toBe("#ff00aa");
+    store.setVoteCardColor("A", "not-a-color");
+    expect(store.match.teamA.voteCardColor).toBe("#ff00aa");
+  });
+
+  it("sets team logo data url", () => {
+    const store = useMatchStore();
+    store.setTeamLogo("B", "data:image/png;base64,abc");
+    expect(store.match.teamB.logoDataUrl).toBe("data:image/png;base64,abc");
+    store.setTeamLogo("B", null);
+    expect(store.match.teamB.logoDataUrl).toBeNull();
+  });
+
   it("nudges impro preset", () => {
     const store = useMatchStore();
     const current = store.match.impro.timer.presetSeconds;

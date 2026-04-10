@@ -65,6 +65,10 @@ export interface TeamState {
   score: number;
   colorToken: string;
   penalties: number;
+  /** Image en data URL (optionnel), pour affichage et persistance offline. */
+  logoDataUrl: string | null;
+  /** Couleur du carton de vote (hex), défaut gauche/droite selon DOMAIN. */
+  voteCardColor: string;
 }
 
 export interface ImproState {

@@ -15,12 +15,13 @@
 
 | Composant | Responsabilité |
 |----------|----------------|
-| **DisplayInline** | Affichage match, édition texte inline et contrôles opérationnels directs |
+| **DisplayInline** | Affichage match, édition texte inline et contrôles opérationnels directs ; centre = un grand cadran (impro ou période) + second cadran compact pour l’autre chrono ; cartes équipe avec logo data URL optionnel, couleur carton de vote, pictos maillot/carton |
 | **HotspotLayer** | Rendu et dispatch des hotspots globaux superposés |
 | **InlineEditableText** | Gestion click-to-edit, commit/rollback clavier |
 | **OverlayPanel** | Affichage plein écran des annonces (clic pour fermeture) |
 | **Match Store** | Règles métier et état global |
-| **Timer Service** | Tick basé timestamp (robuste) |
+| **Timer Service** | Tick basé timestamp (robuste) ; pause sur `startedWithRemainingSeconds` |
+| **displayTimer** (`src/services/displayTimer.ts`) | Règle d’affichage : chrono impro « principal » si statut `live` ou `pause`, sinon chrono période (DOMAIN) |
 | **Persistence Service** | Préférences UI locales versionnées |
 | **RemoteControlQR** | Bouton discret + modale QR pour ouvrir l’app contrôle sur le téléphone |
 | **ControlApp** (`/control`) | UI mobile-first : envoi de commandes WebSocket et réception des snapshots d’état pour rester synchronisée avec l’affichage |
@@ -34,3 +35,4 @@
 - Contrôles fantômes visibles en permanence mais atténués, avec feedback hover renforcé.
 - Modèle pénalités manuel (3 pastilles par équipe), sans automatisme de score.
 - Réglage du chrono impro par paires de flèches séparées: minutes à gauche, secondes à droite.
+- Équipe : champs optionnels `logoDataUrl` (image inline pour offline) et `voteCardColor` (hex, défauts rouge/blanc gauche/droite) dans `TeamState`, sérialisés avec le match persisté et les snapshots remote.

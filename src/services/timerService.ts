@@ -51,11 +51,12 @@ export const pauseTimer = (timer: TimerState, now = Date.now()): TimerState => {
     return timer;
   }
 
+  const baseRemaining = timer.startedWithRemainingSeconds ?? timer.remainingSeconds;
   const elapsedSeconds = Math.floor((now - timer.startedAt) / 1000);
 
   return {
     ...timer,
-    remainingSeconds: clamp(timer.remainingSeconds - elapsedSeconds),
+    remainingSeconds: clamp(baseRemaining - elapsedSeconds),
     startedAt: null,
     startedWithRemainingSeconds: null,
     pausedAt: now

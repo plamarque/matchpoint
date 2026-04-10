@@ -72,7 +72,7 @@ const onKeydown = (event: KeyboardEvent) => {
     :aria-label="ariaLabel"
     @click="start"
   >
-    {{ modelValue || placeholder }}
+    <span class="inline-editable-face">{{ modelValue || placeholder }}</span>
   </button>
 
   <input

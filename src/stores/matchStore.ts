@@ -1,6 +1,8 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import {
+  DEFAULT_VOTE_CARD_COLOR_A,
+  DEFAULT_VOTE_CARD_COLOR_B,
   getNextTeamColor,
   IMPRO_SECOND_STEPS,
   IMPRO_TIME_PRESETS_SECONDS,
@@ -50,13 +52,17 @@ const makeDefaultState = (): MatchState => ({
     name: "Rouges",
     score: 0,
     colorToken: TEAM_PALETTES.classic[0],
-    penalties: 0
+    penalties: 0,
+    logoDataUrl: null,
+    voteCardColor: DEFAULT_VOTE_CARD_COLOR_A
   },
   teamB: {
     name: "Bleus",
     score: 0,
     colorToken: TEAM_PALETTES.classic[1],
-    penalties: 0
+    penalties: 0,
+    logoDataUrl: null,
+    voteCardColor: DEFAULT_VOTE_CARD_COLOR_B
   },
   impro: {
     theme: "Titre de l'improvisation",
@@ -107,13 +113,23 @@ export const useMatchStore = defineStore("match", () => {
         name: m.teamA?.name ?? match.value.teamA.name,
         score: Math.max(0, Number(m.teamA?.score) || 0),
         colorToken: m.teamA?.colorToken ?? match.value.teamA.colorToken,
-        penalties: Math.min(3, Math.max(0, Number(m.teamA?.penalties) ?? 0))
+        penalties: Math.min(3, Math.max(0, Number(m.teamA?.penalties) ?? 0)),
+        logoDataUrl:
+          typeof m.teamA?.logoDataUrl === "string" && m.teamA.logoDataUrl.length > 0
+            ? m.teamA.logoDataUrl
+            : null,
+        voteCardColor: m.teamA?.voteCardColor ?? DEFAULT_VOTE_CARD_COLOR_A
       };
       match.value.teamB = {
         name: m.teamB?.name ?? match.value.teamB.name,
         score: Math.max(0, Number(m.teamB?.score) || 0),
         colorToken: m.teamB?.colorToken ?? match.value.teamB.colorToken,
-        penalties: Math.min(3, Math.max(0, Number(m.teamB?.penalties) ?? 0))
+        penalties: Math.min(3, Math.max(0, Number(m.teamB?.penalties) ?? 0)),
+        logoDataUrl:
+          typeof m.teamB?.logoDataUrl === "string" && m.teamB.logoDataUrl.length > 0
+            ? m.teamB.logoDataUrl
+            : null,
+        voteCardColor: m.teamB?.voteCardColor ?? DEFAULT_VOTE_CARD_COLOR_B
       };
       match.value.impro.theme = m.impro?.theme ?? match.value.impro.theme;
       match.value.impro.category = m.impro?.category ?? match.value.impro.category;
@@ -462,6 +478,28 @@ export const useMatchStore = defineStore("match", () => {
     match.value.teamB.colorToken = getNextTeamColor(match.value.teamB.colorToken);
   };
 
+  const setTeamLogo = (team: TeamKey, dataUrl: string | null) => {
+    if (team === "A") {
+      match.value.teamA.logoDataUrl = dataUrl;
+      return;
+    }
+
+    match.value.teamB.logoDataUrl = dataUrl;
+  };
+
+  const setVoteCardColor = (team: TeamKey, hex: string) => {
+    const trimmed = hex.trim();
+    if (!/^#[0-9A-Fa-f]{6}$/.test(trimmed)) {
+      return;
+    }
+    if (team === "A") {
+      match.value.teamA.voteCardColor = trimmed;
+      return;
+    }
+
+    match.value.teamB.voteCardColor = trimmed;
+  };
+
   const setPalette = (key: keyof typeof TEAM_PALETTES) => {
     const palette = TEAM_PALETTES[key];
     match.value.ui.paletteSelection = key;
@@ -549,6 +587,8 @@ export const useMatchStore = defineStore("match", () => {
     triggerCustomOverlay,
     clearOverlay,
     cycleTeamColor,
+    setTeamLogo,
+    setVoteCardColor,
     setPalette,
     updateScale,
     toggleContrast,

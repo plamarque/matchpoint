@@ -26,6 +26,10 @@ export const TEAM_PALETTES = {
   graphite: ["#f4f1de", "#3d405b"]
 } as const;
 
+/** Défaut spec : carton rouge (équipe gauche), blanc cassé (équipe droite), personnalisables. */
+export const DEFAULT_VOTE_CARD_COLOR_A = "#c62828";
+export const DEFAULT_VOTE_CARD_COLOR_B = "#eceff1";
+
 export const OVERLAY_LABELS: Record<OverlayKey, string> = {
   start_match: "Début du match",
   hymn: "Hymne",

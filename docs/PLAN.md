@@ -4,7 +4,7 @@ Suivi de livraison uniquement. Ce document n’est pas une source de vérité co
 
 ## Phase actuelle
 
-V1 inline-only implémentée (refonte UX type Gazoo).
+V1 inline-only ; évolutions d’affichage alignées sur SPEC/DOMAIN (chrono unique, panneaux score, logos, rappels vote) livrées en tranches 6.x ci-dessous.
 
 ## Tranches
 
@@ -16,6 +16,11 @@ V1 inline-only implémentée (refonte UX type Gazoo).
 | 3 | Contrôle inline fantôme | Fait |
 | 4 | Tests + docs normatives | Fait |
 | 5 | Télécommande distante (backend Cloud Run) | Fait |
+| 6.1 | Zone chronomètre principale unique (statut → impro vs période) + chrono secondaire compact | Fait |
+| 6.2 | Panneaux score type cadran (perspective, scores moins massifs) | Fait |
+| 6.3 | Logo équipe optionnel (data URL, persistance, snapshot remote) | Fait |
+| 6.4 | Rappels maillot / carton de vote + hiérarchie titre / méta en tête | Fait |
+| 6.5 | Tests unitaires + doc ARCH ; correctif pause chrono (`pauseTimer` cohérent avec `tickTimer`) | Fait |
 
 ## Tâches
 

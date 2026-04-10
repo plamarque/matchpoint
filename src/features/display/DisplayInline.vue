@@ -8,9 +8,10 @@ import OverlayPanel from "@/features/overlay/OverlayPanel.vue";
 import RemoteControlQR from "@/features/display/RemoteControlQR.vue";
 import { buildSnapshot } from "@/remote/stateSnapshot";
 import { useRemoteChannel } from "@/remote/useRemoteChannel";
+import { isPrimaryChronoImpro } from "@/services/displayTimer";
 import { formatClock, parseClock } from "@/services/timerService";
 import { useMatchStore } from "@/stores/matchStore";
-import type { HotspotDefinition, OverlayKey } from "@/types/match";
+import type { HotspotDefinition, OverlayKey, TeamKey } from "@/types/match";
 import { useKeyboardShortcuts } from "@/utils/useKeyboardShortcuts";
 
 const remoteBackendUrl = (import.meta.env as { VITE_REMOTE_BACKEND_WS_URL?: string }).VITE_REMOTE_BACKEND_WS_URL ?? "";
@@ -118,6 +119,23 @@ const improPlayPauseIcon = computed(() => (match.value.impro.isRunning ? "⏸" :
 const periodPlayPauseIcon = computed(() =>
   match.value.periodTimer.startedAt !== null ? "⏸" : "▶"
 );
+
+/** Grand cadran central : impro si live/pause, sinon période (DOMAIN). */
+const primaryChronoIsImpro = computed(() => isPrimaryChronoImpro(match.value.status));
+const primaryTimerRunning = computed(() =>
+  primaryChronoIsImpro.value
+    ? match.value.impro.isRunning
+    : match.value.periodTimer.startedAt !== null
+);
+const secondaryTimerRunning = computed(() =>
+  primaryChronoIsImpro.value
+    ? match.value.periodTimer.startedAt !== null
+    : match.value.impro.isRunning
+);
+
+/** TEMP : opacité idle minimale pour repérer les boutons sans survol — à retirer quand l’UI est figée. */
+const ghostIdleForDebug = computed(() => Math.max(0.34, match.value.ui.ghostIdleOpacity));
+
 const penaltySlots = [1, 2, 3] as const;
 const overlayEntries = computed(() => Object.entries(store.overlayLabels) as Array<[string, string]>);
 
@@ -212,6 +230,31 @@ const togglePenaltyDot = (team: "A" | "B", slot: 1 | 2 | 3) => {
   store.setPenaltyLevel(team, next);
 };
 
+const logoInputA = ref<HTMLInputElement | null>(null);
+const logoInputB = ref<HTMLInputElement | null>(null);
+
+function openLogoPicker(team: TeamKey) {
+  const el = team === "A" ? logoInputA.value : logoInputB.value;
+  el?.click();
+}
+
+function onTeamLogoFile(team: TeamKey, event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = "";
+  if (!file || !file.type.startsWith("image/")) {
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const data = reader.result;
+    if (typeof data === "string") {
+      store.setTeamLogo(team, data);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
 useKeyboardShortcuts((event) => {
   const key = event.key.toLowerCase();
   if (key === "f") {
@@ -262,66 +305,74 @@ onUnmounted(() => {
 <template>
   <main
     class="display-inline"
-    :style="{ '--display-scale': String(match.ui.displayScale) }"
+    :style="{
+      '--display-scale': String(match.ui.displayScale),
+      '--ghost-idle-opacity': String(ghostIdleForDebug),
+      '--ghost-hover-opacity': String(match.ui.ghostHoverOpacity)
+    }"
   >
-    <header class="display-header inline-header">
+    <header class="display-header inline-header display-header--tiered">
       <InlineEditableText
         aria-label="Titre de l'impro"
-        class-name="title-inline"
+        class-name="title-inline title-inline--hero"
         :model-value="match.impro.theme"
         placeholder="Titre de l'improvisation"
         @update:model-value="store.setTheme"
       />
-      <div class="category-type-line header-meta">
-        <InlineEditableText
-          aria-label="Catégorie"
-          class-name="category-inline"
-          :model-value="match.impro.category"
-          placeholder="Catégorie"
-          @update:model-value="store.setCategory"
-        />
-        <button
-          class="inline-editable impro-type-inline"
-          :class="{ 'impro-type-inline--filled': isImproTypeFilled }"
-          type="button"
-          aria-label="Type d'impro (cliquer pour changer)"
-          @click="store.toggleImproType"
-        >
-          {{ improTypeLabel }}
-        </button>
-      </div>
     </header>
 
     <section class="score-grid inline-grid">
-      <div class="score-grid-label score-grid-label--category">
-        <InlineEditableText
-          aria-label="Catégorie"
-          class-name="category-inline score-column-category"
-          :model-value="match.impro.category"
-          placeholder="Catégorie"
-          @update:model-value="store.setCategory"
-        />
-      </div>
+      <div class="score-grid-label score-grid-label--category" aria-hidden="true" />
       <div class="score-grid-label score-grid-label--spacer" aria-hidden="true" />
-      <div class="score-grid-label score-grid-label--type">
-        <button
-          class="inline-editable impro-type-inline score-column-type"
-          :class="{ 'impro-type-inline--filled': isImproTypeFilled }"
-          type="button"
-          aria-label="Type d'impro (cliquer pour changer)"
-          @click="store.toggleImproType"
-        >
-          {{ improTypeLabel }}
-        </button>
-      </div>
-      <article class="team-card" :style="{ '--team-color': match.teamA.colorToken }">
-        <InlineEditableText
-          aria-label="Nom équipe A"
-          class-name="team-name"
-          :model-value="match.teamA.name"
-          placeholder="Équipe A"
-          @update:model-value="(value) => store.setTeamName('A', value)"
-        />
+      <div class="score-grid-label score-grid-label--type" aria-hidden="true" />
+      <article
+        class="team-card team-card--scoreboard team-card--a"
+        :style="{ '--team-color': match.teamA.colorToken, '--vote-card': match.teamA.voteCardColor }"
+      >
+        <div class="team-card-top">
+          <span class="team-jersey" aria-hidden="true" title="Couleur maillot" />
+          <span class="team-vote-card" aria-hidden="true" title="Carton de vote" />
+          <img
+            v-if="match.teamA.logoDataUrl"
+            class="team-logo"
+            alt=""
+            :src="match.teamA.logoDataUrl"
+          />
+          <input
+            ref="logoInputA"
+            type="file"
+            class="team-logo-input"
+            accept="image/*"
+            tabindex="-1"
+            aria-hidden="true"
+            @change="(e) => onTeamLogoFile('A', e)"
+          />
+          <button
+            type="button"
+            class="ghost-hotspot team-logo-trigger"
+            aria-label="Choisir un logo équipe A"
+            title="Logo"
+            @click="openLogoPicker('A')"
+          >
+            {{ match.teamA.logoDataUrl ? "Logo" : "＋" }}
+          </button>
+          <button
+            v-if="match.teamA.logoDataUrl"
+            type="button"
+            class="ghost-hotspot team-logo-clear"
+            aria-label="Retirer le logo équipe A"
+            @click.stop="store.setTeamLogo('A', null)"
+          >
+            ×
+          </button>
+          <InlineEditableText
+            aria-label="Nom équipe A"
+            class-name="team-name"
+            :model-value="match.teamA.name"
+            placeholder="Équipe A"
+            @update:model-value="(value) => store.setTeamName('A', value)"
+          />
+        </div>
         <div class="score-wrap">
           <button
             class="score-side-btn score-minus"
@@ -359,76 +410,314 @@ onUnmounted(() => {
           title="Couleur"
           @click.stop="store.cycleTeamColor('A')"
         />
+        <label class="ghost-hotspot team-vote-color-wrap" title="Couleur carton de vote">
+          <span class="sr-only">Couleur carton de vote équipe A</span>
+          <input
+            class="team-vote-color-input"
+            type="color"
+            :value="match.teamA.voteCardColor"
+            @input="(e) => store.setVoteCardColor('A', (e.target as HTMLInputElement).value)"
+          />
+        </label>
       </article>
 
       <section class="center-stack">
-        <article class="timer-card" :class="{ running: match.impro.isRunning }">
-          <div class="impro-clock-layout">
-            <div class="impro-arrow-pair">
+        <div class="center-stack-category">
+          <InlineEditableText
+            aria-label="Catégorie"
+            class-name="category-inline category-inline--center-stack"
+            :model-value="match.impro.category"
+            placeholder="Catégorie"
+            @update:model-value="store.setCategory"
+          />
+        </div>
+
+        <div class="center-stack-impro-type">
+          <button
+            class="inline-editable impro-type-inline impro-type-inline--center-stack"
+            :class="{ 'impro-type-inline--filled': isImproTypeFilled }"
+            type="button"
+            aria-label="Type d'impro (cliquer pour changer)"
+            @click="store.toggleImproType"
+          >
+            {{ improTypeLabel }}
+          </button>
+        </div>
+
+        <article class="timer-card timer-card--primary" :class="{ running: primaryTimerRunning }">
+          <template v-if="primaryChronoIsImpro">
+            <div class="impro-clock-layout">
+              <div class="impro-arrow-pair">
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Minutes impro +"
+                  @click="store.nudgeImproMinutes(1)"
+                >
+                  ▲
+                </button>
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Minutes impro -"
+                  @click="store.nudgeImproMinutes(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+
+              <InlineEditableText
+                aria-label="Temps restant impro"
+                class-name="clock inline-editable-clock"
+                :model-value="formatClock(match.impro.timer.remainingSeconds)"
+                placeholder="0:00"
+                @update:model-value="onImproRemainingCommit"
+              />
+
+              <div class="impro-arrow-pair">
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Secondes impro +"
+                  @click="store.nudgeImproSecondsStep(1)"
+                >
+                  ▲
+                </button>
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Secondes impro -"
+                  @click="store.nudgeImproSecondsStep(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+            </div>
+            <div class="timer-controls-row">
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot timer-action-btn"
                 type="button"
-                aria-label="Minutes impro +"
-                @click="store.nudgeImproMinutes(1)"
+                aria-label="Play/Pause impro"
+                @click="store.toggleImpro"
               >
-                ▲
+                {{ improPlayPauseIcon }}
               </button>
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
                 type="button"
-                aria-label="Minutes impro -"
-                @click="store.nudgeImproMinutes(-1)"
+                aria-label="Reset impro"
+                @click="store.resetImpro"
               >
-                ▼
+                ↺
               </button>
             </div>
+          </template>
+          <template v-else>
+            <div class="impro-clock-layout">
+              <div class="impro-arrow-pair">
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Minutes période +"
+                  @click="store.nudgePeriodPreset(1)"
+                >
+                  ▲
+                </button>
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Minutes période -"
+                  @click="store.nudgePeriodPreset(-1)"
+                >
+                  ▼
+                </button>
+              </div>
 
-            <InlineEditableText
-              aria-label="Temps restant impro"
-              class-name="clock inline-editable-clock"
-              :model-value="formatClock(match.impro.timer.remainingSeconds)"
-              placeholder="0:00"
-              @update:model-value="onImproRemainingCommit"
-            />
+              <InlineEditableText
+                aria-label="Temps restant période"
+                class-name="clock inline-editable-clock"
+                :model-value="formatClock(match.periodTimer.remainingSeconds)"
+                placeholder="0:00"
+                @update:model-value="onPeriodRemainingCommit"
+              />
 
-            <div class="impro-arrow-pair">
+              <div class="impro-arrow-pair">
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Secondes période +"
+                  @click="store.nudgePeriodSecondsStep(1)"
+                >
+                  ▲
+                </button>
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Secondes période -"
+                  @click="store.nudgePeriodSecondsStep(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+            </div>
+            <div class="timer-controls-row">
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot timer-action-btn"
                 type="button"
-                aria-label="Secondes impro +"
-                @click="store.nudgeImproSecondsStep(1)"
+                aria-label="Play/Pause période"
+                @click="store.togglePeriod"
               >
-                ▲
+                {{ periodPlayPauseIcon }}
               </button>
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
                 type="button"
-                aria-label="Secondes impro -"
-                @click="store.nudgeImproSecondsStep(-1)"
+                aria-label="Reset période"
+                @click="store.resetPeriod"
               >
-                ▼
+                ↺
               </button>
             </div>
-          </div>
-          <div class="timer-controls-row">
-            <button
-              class="ghost-hotspot timer-action-btn"
-              type="button"
-              aria-label="Play/Pause impro"
-              @click="store.toggleImpro"
-            >
-              {{ improPlayPauseIcon }}
-            </button>
-            <button
-              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
-              type="button"
-              aria-label="Reset impro"
-              @click="store.resetImpro"
-            >
-              ↺
-            </button>
-          </div>
+          </template>
         </article>
+
+        <article class="timer-card timer-card--compact" :class="{ running: secondaryTimerRunning }">
+          <template v-if="primaryChronoIsImpro">
+            <div class="impro-clock-layout">
+              <div class="impro-arrow-pair">
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Minutes période +"
+                  @click="store.nudgePeriodPreset(1)"
+                >
+                  ▲
+                </button>
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Minutes période -"
+                  @click="store.nudgePeriodPreset(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+
+              <InlineEditableText
+                aria-label="Temps restant période"
+                class-name="clock inline-editable-clock"
+                :model-value="formatClock(match.periodTimer.remainingSeconds)"
+                placeholder="0:00"
+                @update:model-value="onPeriodRemainingCommit"
+              />
+
+              <div class="impro-arrow-pair">
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Secondes période +"
+                  @click="store.nudgePeriodSecondsStep(1)"
+                >
+                  ▲
+                </button>
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Secondes période -"
+                  @click="store.nudgePeriodSecondsStep(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+            </div>
+            <div class="timer-controls-row">
+              <button
+                class="ghost-hotspot timer-action-btn"
+                type="button"
+                aria-label="Play/Pause période"
+                @click="store.togglePeriod"
+              >
+                {{ periodPlayPauseIcon }}
+              </button>
+              <button
+                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+                type="button"
+                aria-label="Reset période"
+                @click="store.resetPeriod"
+              >
+                ↺
+              </button>
+            </div>
+          </template>
+          <template v-else>
+            <div class="impro-clock-layout">
+              <div class="impro-arrow-pair">
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Minutes impro +"
+                  @click="store.nudgeImproMinutes(1)"
+                >
+                  ▲
+                </button>
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Minutes impro -"
+                  @click="store.nudgeImproMinutes(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+
+              <InlineEditableText
+                aria-label="Temps restant impro"
+                class-name="clock inline-editable-clock"
+                :model-value="formatClock(match.impro.timer.remainingSeconds)"
+                placeholder="0:00"
+                @update:model-value="onImproRemainingCommit"
+              />
+
+              <div class="impro-arrow-pair">
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Secondes impro +"
+                  @click="store.nudgeImproSecondsStep(1)"
+                >
+                  ▲
+                </button>
+                <button
+                  class="ghost-hotspot arrow-btn"
+                  type="button"
+                  aria-label="Secondes impro -"
+                  @click="store.nudgeImproSecondsStep(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+            </div>
+            <div class="timer-controls-row">
+              <button
+                class="ghost-hotspot timer-action-btn"
+                type="button"
+                aria-label="Play/Pause impro"
+                @click="store.toggleImpro"
+              >
+                {{ improPlayPauseIcon }}
+              </button>
+              <button
+                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+                type="button"
+                aria-label="Reset impro"
+                @click="store.resetImpro"
+              >
+                ↺
+              </button>
+            </div>
+          </template>
+        </article>
+
         <div class="period-row">
           <button
             type="button"
@@ -448,83 +737,56 @@ onUnmounted(() => {
             →
           </button>
         </div>
-        <article class="timer-card" :class="{ running: match.periodTimer.startedAt !== null }">
-          <div class="impro-clock-layout">
-            <div class="impro-arrow-pair">
-              <button
-                class="ghost-hotspot arrow-btn"
-                type="button"
-                aria-label="Minutes période +"
-                @click="store.nudgePeriodPreset(1)"
-              >
-                ▲
-              </button>
-              <button
-                class="ghost-hotspot arrow-btn"
-                type="button"
-                aria-label="Minutes période -"
-                @click="store.nudgePeriodPreset(-1)"
-              >
-                ▼
-              </button>
-            </div>
-
-            <InlineEditableText
-              aria-label="Temps restant période"
-              class-name="clock inline-editable-clock"
-              :model-value="formatClock(match.periodTimer.remainingSeconds)"
-              placeholder="0:00"
-              @update:model-value="onPeriodRemainingCommit"
-            />
-
-            <div class="impro-arrow-pair">
-              <button
-                class="ghost-hotspot arrow-btn"
-                type="button"
-                aria-label="Secondes période +"
-                @click="store.nudgePeriodSecondsStep(1)"
-              >
-                ▲
-              </button>
-              <button
-                class="ghost-hotspot arrow-btn"
-                type="button"
-                aria-label="Secondes période -"
-                @click="store.nudgePeriodSecondsStep(-1)"
-              >
-                ▼
-              </button>
-            </div>
-          </div>
-          <div class="timer-controls-row">
-            <button
-              class="ghost-hotspot timer-action-btn"
-              type="button"
-              aria-label="Play/Pause période"
-              @click="store.togglePeriod"
-            >
-              {{ periodPlayPauseIcon }}
-            </button>
-            <button
-              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
-              type="button"
-              aria-label="Reset période"
-              @click="store.resetPeriod"
-            >
-              ↺
-            </button>
-          </div>
-        </article>
       </section>
 
-      <article class="team-card" :style="{ '--team-color': match.teamB.colorToken }">
-        <InlineEditableText
-          aria-label="Nom équipe B"
-          class-name="team-name"
-          :model-value="match.teamB.name"
-          placeholder="Équipe B"
-          @update:model-value="(value) => store.setTeamName('B', value)"
-        />
+      <article
+        class="team-card team-card--scoreboard team-card--b"
+        :style="{ '--team-color': match.teamB.colorToken, '--vote-card': match.teamB.voteCardColor }"
+      >
+        <div class="team-card-top">
+          <span class="team-jersey" aria-hidden="true" title="Couleur maillot" />
+          <span class="team-vote-card" aria-hidden="true" title="Carton de vote" />
+          <img
+            v-if="match.teamB.logoDataUrl"
+            class="team-logo"
+            alt=""
+            :src="match.teamB.logoDataUrl"
+          />
+          <input
+            ref="logoInputB"
+            type="file"
+            class="team-logo-input"
+            accept="image/*"
+            tabindex="-1"
+            aria-hidden="true"
+            @change="(e) => onTeamLogoFile('B', e)"
+          />
+          <button
+            type="button"
+            class="ghost-hotspot team-logo-trigger"
+            aria-label="Choisir un logo équipe B"
+            title="Logo"
+            @click="openLogoPicker('B')"
+          >
+            {{ match.teamB.logoDataUrl ? "Logo" : "＋" }}
+          </button>
+          <button
+            v-if="match.teamB.logoDataUrl"
+            type="button"
+            class="ghost-hotspot team-logo-clear"
+            aria-label="Retirer le logo équipe B"
+            @click.stop="store.setTeamLogo('B', null)"
+          >
+            ×
+          </button>
+          <InlineEditableText
+            aria-label="Nom équipe B"
+            class-name="team-name"
+            :model-value="match.teamB.name"
+            placeholder="Équipe B"
+            @update:model-value="(value) => store.setTeamName('B', value)"
+          />
+        </div>
         <div class="score-wrap">
           <button
             class="score-side-btn score-minus"
@@ -562,6 +824,15 @@ onUnmounted(() => {
           title="Couleur"
           @click.stop="store.cycleTeamColor('B')"
         />
+        <label class="ghost-hotspot team-vote-color-wrap team-vote-color-wrap--right" title="Couleur carton de vote">
+          <span class="sr-only">Couleur carton de vote équipe B</span>
+          <input
+            class="team-vote-color-input"
+            type="color"
+            :value="match.teamB.voteCardColor"
+            @input="(e) => store.setVoteCardColor('B', (e.target as HTMLInputElement).value)"
+          />
+        </label>
       </article>
     </section>
 
@@ -581,7 +852,7 @@ onUnmounted(() => {
 
     <HotspotLayer
       :hotspots="hotspots"
-      :idle-opacity="match.ui.ghostIdleOpacity"
+      :idle-opacity="ghostIdleForDebug"
       :hover-opacity="match.ui.ghostHoverOpacity"
       :hotspot-scale="match.ui.hotspotScale"
       @action="applyAction"
@@ -591,7 +862,7 @@ onUnmounted(() => {
       :model-value="store.showRemoteQrModal"
       @update:model-value="store.setShowRemoteQrModal"
       :session-info="sessionInfo"
-      :idle-opacity="match.ui.ghostIdleOpacity"
+      :idle-opacity="ghostIdleForDebug"
       :hover-opacity="match.ui.ghostHoverOpacity"
       :hotspot-scale="match.ui.hotspotScale"
     />
