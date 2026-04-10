@@ -592,30 +592,41 @@ html {
 }
 
 .center-stack {
-  display: grid;
-  grid-template-rows: 1fr auto 1fr;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   align-items: stretch;
-  justify-items: stretch;
   align-self: stretch;
   width: 100%;
   min-width: 0;
   min-height: 0;
 }
 
-.center-stack-meta {
-  grid-row: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  align-items: stretch;
-  gap: clamp(0.4rem, 1vh, 0.8rem);
-  min-height: 0;
-  padding-bottom: clamp(0.25rem, 0.6vh, 0.5rem);
+/* Bandes flexibles haut / bas : bloc catégorie + chrono + type centré dans la colonne, sans chevauchement */
+.center-stack::before,
+.center-stack::after {
+  content: '';
+  flex: 1 1 0;
+  min-height: clamp(1rem, 2.8vh, 2.25rem);
+  pointer-events: none;
 }
 
-.center-stack .timer-card {
-  grid-row: 2;
+.center-stack-middle {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(1rem, 2.8vh, 2rem);
+  width: 100%;
+  min-width: 0;
+}
+
+.center-stack-meta {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  flex: 0 0 auto;
+  min-height: 0;
 }
 
 .center-stack .timer-card--primary {
@@ -712,7 +723,7 @@ html {
   justify-content: center;
   align-items: center;
   width: 100%;
-  padding: 0 0.35rem 0.45rem;
+  padding: 0 0.35rem;
 }
 
 /* Comme la catégorie (accent, sans bordure pilule) mais police plus petite */
@@ -1427,7 +1438,7 @@ html.contrast-high {
   .center-stack {
     aspect-ratio: auto;
     align-self: stretch;
-    /* Hauteur minimale pour que les pistes 1fr / auto / 1fr distribuent l’espace */
+    /* Hauteur minimale pour que les flex spacers (::before/::after) puissent équilibrer le bloc central */
     min-height: min(52vh, 28rem);
   }
 
@@ -1451,7 +1462,7 @@ html.contrast-high {
   }
 }
 
-/* iPad paysage 1024×768 : garder les 3 colonnes ; catégorie / type dans la colonne centre */
+/* iPad paysage 1024×768 : garder les 3 colonnes ; catégorie et chrono + type dans la colonne centre */
 @media (min-width: 1024px) {
   .score-grid-label {
     display: flex;
@@ -1568,7 +1579,7 @@ html.contrast-high {
     gap: 0.5rem;
   }
 
-  .center-stack {
+  .center-stack-middle {
     gap: 0.4rem;
   }
 

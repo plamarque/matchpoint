@@ -485,16 +485,100 @@ onUnmounted(() => {
       </article>
 
       <section class="center-stack">
-        <div class="center-stack-meta">
-          <div class="center-stack-category">
-            <InlineEditableText
-              aria-label="Catégorie"
-              class-name="category-inline category-inline--center-stack"
-              :model-value="match.impro.category"
-              placeholder="Catégorie"
-              @update:model-value="store.setCategory"
-            />
+        <div class="center-stack-middle">
+          <div class="center-stack-meta">
+            <div class="center-stack-category">
+              <InlineEditableText
+                aria-label="Catégorie"
+                class-name="category-inline category-inline--center-stack"
+                :model-value="match.impro.category"
+                placeholder="Catégorie"
+                @update:model-value="store.setCategory"
+              />
+            </div>
           </div>
+
+          <article
+            class="timer-card"
+            :class="[
+              primaryChronoIsImpro ? 'timer-card--primary' : 'timer-card--compact',
+              {
+                running: primaryChronoIsImpro ? primaryTimerRunning : secondaryTimerRunning
+              }
+            ]"
+          >
+            <div class="dock-period-clock-row">
+              <div class="dock-period-unit">
+                <button
+                  class="ghost-hotspot arrow-btn dock-period-arrow"
+                  type="button"
+                  aria-label="Minutes impro +"
+                  @click="store.nudgeImproMinutes(1)"
+                >
+                  ▲
+                </button>
+                <InlineEditableText
+                  aria-label="Minutes impro"
+                  class-name="clock inline-editable-clock dock-period-mm"
+                  :model-value="improMinutesPadded"
+                  placeholder="00"
+                  @update:model-value="onImproMinutesCommit"
+                />
+                <button
+                  class="ghost-hotspot arrow-btn dock-period-arrow"
+                  type="button"
+                  aria-label="Minutes impro -"
+                  @click="store.nudgeImproMinutes(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+              <span class="dock-period-colon" aria-hidden="true">:</span>
+              <div class="dock-period-unit">
+                <button
+                  class="ghost-hotspot arrow-btn dock-period-arrow"
+                  type="button"
+                  aria-label="Secondes impro +"
+                  @click="store.nudgeImproSecondsStep(1)"
+                >
+                  ▲
+                </button>
+                <InlineEditableText
+                  aria-label="Secondes impro"
+                  class-name="clock inline-editable-clock dock-period-ss"
+                  :model-value="improSecondsPadded"
+                  placeholder="00"
+                  @update:model-value="onImproSecondsCommit"
+                />
+                <button
+                  class="ghost-hotspot arrow-btn dock-period-arrow"
+                  type="button"
+                  aria-label="Secondes impro -"
+                  @click="store.nudgeImproSecondsStep(-1)"
+                >
+                  ▼
+                </button>
+              </div>
+              <div class="dock-period-side-actions">
+                <button
+                  class="ghost-hotspot timer-action-btn"
+                  type="button"
+                  aria-label="Play/Pause impro"
+                  @click="store.toggleImpro"
+                >
+                  {{ improPlayPauseIcon }}
+                </button>
+                <button
+                  class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+                  type="button"
+                  aria-label="Reset impro"
+                  @click="store.resetImpro"
+                >
+                  ↺
+                </button>
+              </div>
+            </div>
+          </article>
 
           <div class="center-stack-impro-type">
             <button
@@ -508,88 +592,6 @@ onUnmounted(() => {
             </button>
           </div>
         </div>
-
-        <article
-          class="timer-card"
-          :class="[
-            primaryChronoIsImpro ? 'timer-card--primary' : 'timer-card--compact',
-            {
-              running: primaryChronoIsImpro ? primaryTimerRunning : secondaryTimerRunning
-            }
-          ]"
-        >
-          <div class="dock-period-clock-row">
-            <div class="dock-period-unit">
-              <button
-                class="ghost-hotspot arrow-btn dock-period-arrow"
-                type="button"
-                aria-label="Minutes impro +"
-                @click="store.nudgeImproMinutes(1)"
-              >
-                ▲
-              </button>
-              <InlineEditableText
-                aria-label="Minutes impro"
-                class-name="clock inline-editable-clock dock-period-mm"
-                :model-value="improMinutesPadded"
-                placeholder="00"
-                @update:model-value="onImproMinutesCommit"
-              />
-              <button
-                class="ghost-hotspot arrow-btn dock-period-arrow"
-                type="button"
-                aria-label="Minutes impro -"
-                @click="store.nudgeImproMinutes(-1)"
-              >
-                ▼
-              </button>
-            </div>
-            <span class="dock-period-colon" aria-hidden="true">:</span>
-            <div class="dock-period-unit">
-              <button
-                class="ghost-hotspot arrow-btn dock-period-arrow"
-                type="button"
-                aria-label="Secondes impro +"
-                @click="store.nudgeImproSecondsStep(1)"
-              >
-                ▲
-              </button>
-              <InlineEditableText
-                aria-label="Secondes impro"
-                class-name="clock inline-editable-clock dock-period-ss"
-                :model-value="improSecondsPadded"
-                placeholder="00"
-                @update:model-value="onImproSecondsCommit"
-              />
-              <button
-                class="ghost-hotspot arrow-btn dock-period-arrow"
-                type="button"
-                aria-label="Secondes impro -"
-                @click="store.nudgeImproSecondsStep(-1)"
-              >
-                ▼
-              </button>
-            </div>
-            <div class="dock-period-side-actions">
-              <button
-                class="ghost-hotspot timer-action-btn"
-                type="button"
-                aria-label="Play/Pause impro"
-                @click="store.toggleImpro"
-              >
-                {{ improPlayPauseIcon }}
-              </button>
-              <button
-                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
-                type="button"
-                aria-label="Reset impro"
-                @click="store.resetImpro"
-              >
-                ↺
-              </button>
-            </div>
-          </div>
-        </article>
       </section>
 
       <article
