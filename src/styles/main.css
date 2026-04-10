@@ -27,18 +27,44 @@ body,
   font-family: var(--font-ui);
 }
 
+/* Évite le décalage dû à la barre de défilement horizontale (vw vs largeur utile) */
+html {
+  overflow-x: hidden;
+}
+
 .display-inline {
+  --display-inline-pad-x: max(
+    clamp(1rem, 2.2vw, 2rem),
+    env(safe-area-inset-left, 0px),
+    env(safe-area-inset-right, 0px)
+  );
   min-height: 100vh;
   min-height: 100dvh;
-  padding: clamp(1.1rem, 2.6vh, 2rem) clamp(1rem, 2.2vw, 2rem)
-    calc(clamp(1.3rem, 2.8vh, 2.2rem) + clamp(6rem, 15vh, 9.5rem));
-  transform: scale(var(--display-scale));
-  transform-origin: top left;
+  padding-top: clamp(1.1rem, 2.6vh, 2rem);
+  padding-bottom: calc(clamp(1.3rem, 2.8vh, 2.2rem) + clamp(6rem, 15vh, 9.5rem));
+  padding-left: var(--display-inline-pad-x);
+  padding-right: var(--display-inline-pad-x);
+  /* Le scale sur <main> cassait position:fixed (footer) et pouvait désaxer tout le bloc */
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.display-inline-scale {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
   display: grid;
   grid-template-rows: auto 1fr;
   align-items: stretch;
+  transform: scale(var(--display-scale));
+  transform-origin: top center;
 }
 
 .display-header {
@@ -224,7 +250,8 @@ body,
 
 .inline-grid {
   display: grid;
-  grid-template-columns: 1fr minmax(260px, 0.75fr) 1fr;
+  /* minmax(0, 1fr) : sinon min-content du contenu (focus nom, logo…) gonfle une colonne et réduit l’autre */
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.75fr) minmax(0, 1fr);
   gap: 1rem;
   align-items: stretch;
   margin-top: clamp(1.4rem, 3.5vh, 2.8rem);
@@ -232,20 +259,36 @@ body,
   min-height: 0;
 }
 
+/* Cartes carrées : moins larges que la cellule 1fr — coller A au bord intérieur gauche, B au bord intérieur droit */
+.inline-grid .team-card--scoreboard.team-card--a {
+  justify-self: start;
+}
+
+.inline-grid .team-card--scoreboard.team-card--b {
+  justify-self: end;
+}
+
 .team-card {
   background: linear-gradient(145deg, color-mix(in srgb, var(--team-color) 72%, black), color-mix(in srgb, var(--team-color) 45%, #12263a));
   border-radius: var(--radius);
   box-shadow: 0 16px 48px rgb(0 0 0 / 32%);
-  padding: clamp(0.75rem, 1.5vh, 1.1rem);
+  padding: clamp(0.55rem, 1.2vh, 0.9rem);
   display: grid;
   grid-template-rows: auto 1fr auto;
   align-content: start;
   gap: 0.2rem;
   position: relative;
   text-align: center;
+  box-sizing: border-box;
+  /* Largeur imposée par la cellule, plafonnée en vh : la taille ne dépend plus du min-content (focus nom, input…) */
+  width: min(100%, 52vh);
+  max-width: 100%;
+  min-width: 0;
   aspect-ratio: 1 / 1;
+  height: auto;
+  max-height: min(52vh, 100%);
   align-self: center;
-  max-height: min(58vh, 100%);
+  overflow-x: clip;
 }
 
 .team-card--scoreboard {
@@ -258,22 +301,29 @@ body,
 
 .team-card--a.team-card--scoreboard {
   transform: perspective(880px) rotateY(-5deg);
-  transform-origin: right center;
+  transform-origin: center center;
 }
 
 .team-card--b.team-card--scoreboard {
   transform: perspective(880px) rotateY(5deg);
-  transform-origin: left center;
+  transform-origin: center center;
 }
 
 .team-card-top {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(0.5rem, 1.4vh, 0.85rem);
+  gap: clamp(0.35rem, 1.1vh, 0.65rem);
   width: 100%;
+  min-width: 0;
   position: relative;
   z-index: 14;
+}
+
+.team-card .inline-editable,
+.team-card .inline-input {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .team-logo-zone {
@@ -296,8 +346,8 @@ body,
 .team-logo-frame {
   position: relative;
   width: 100%;
-  max-width: min(100%, 17.5rem);
-  min-height: clamp(5rem, 12vh, 8.5rem);
+  max-width: min(100%, 14.5rem);
+  min-height: clamp(4rem, 10vh, 7rem);
   border-radius: 0;
   box-sizing: border-box;
   display: flex;
@@ -345,7 +395,7 @@ body,
   position: relative;
   display: block;
   max-width: 100%;
-  max-height: clamp(5.5rem, 14vh, 9.25rem);
+  max-height: clamp(4.25rem, 11.5vh, 7.5rem);
   width: auto;
   height: auto;
   object-fit: contain;
@@ -407,11 +457,13 @@ body,
 
 .team-name {
   margin: 0;
-  font-size: clamp(2rem, 3.6vw, 4.2rem);
+  font-size: clamp(1.55rem, 3vw, 3.35rem);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   text-align: center;
   position: relative;
   z-index: 14;
@@ -422,7 +474,7 @@ body,
 .team-score {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 11vw, 12rem);
+  font-size: clamp(2.75rem, 9vw, 9.25rem);
   font-weight: 800;
   line-height: 0.9;
   width: 100%;
@@ -437,6 +489,7 @@ body,
   display: grid;
   place-items: center;
   width: 100%;
+  min-width: 0;
 }
 
 /* Triangle en coin pour changer la couleur — inférieur gauche (A) / inférieur droit (B) */
@@ -480,16 +533,16 @@ body,
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: clamp(2.5rem, 4.4vw, 4.8rem);
-  height: clamp(6.4rem, 14.2vw, 13.6rem);
+  width: clamp(2.1rem, 3.6vw, 4rem);
+  height: clamp(5.2rem, 12vw, 11rem);
   border: 1px solid rgb(255 255 255 / 28%);
-  border-radius: 14px;
+  border-radius: 12px;
   background: rgb(255 255 255 / 20%);
   color: #fff;
   opacity: var(--ghost-idle-opacity);
   cursor: pointer;
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 3rem);
+  font-size: clamp(1.25rem, 2.5vw, 2.5rem);
   line-height: 1;
   z-index: 13;
 }
@@ -501,15 +554,15 @@ body,
 }
 
 .score-minus {
-  left: clamp(1.65rem, 2.9vw, 3rem);
+  left: clamp(1.25rem, 2.4vw, 2.5rem);
 }
 
 .score-plus {
-  right: clamp(1.65rem, 2.9vw, 3rem);
+  right: clamp(1.25rem, 2.4vw, 2.5rem);
 }
 
 .penalties-row {
-  margin-top: clamp(0.9rem, 2.2vh, 1.8rem);
+  margin-top: clamp(0.55rem, 1.6vh, 1.35rem);
   width: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -540,11 +593,12 @@ body,
 .center-stack {
   display: grid;
   grid-template-rows: 1fr auto 1fr;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
   justify-items: stretch;
   align-self: stretch;
   width: 100%;
+  min-width: 0;
   min-height: 0;
 }
 
@@ -1090,12 +1144,13 @@ body,
 
 .display-bottom-dock-main {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
-  gap: 0.35rem;
+  justify-content: center;
+  gap: clamp(0.35rem, 1vh, 0.6rem) clamp(0.35rem, 1.2vw, 0.65rem);
   width: 100%;
-  max-width: min(92vw, 36rem);
+  max-width: min(96vw, 52rem);
   margin: 0 auto;
   padding: 0 0.5rem;
 }
@@ -1106,9 +1161,11 @@ body,
   border: none !important;
   box-shadow: none !important;
   border-radius: 0;
-  width: 100%;
+  width: auto;
   max-width: min(100%, 30rem);
-  margin: 0 auto;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
   padding: 0;
 }
 
@@ -1127,9 +1184,10 @@ body,
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.35rem clamp(0.45rem, 1.5vw, 0.75rem);
   width: 100%;
+  min-width: 0;
 }
 
 .dock-period-unit {
@@ -1138,6 +1196,29 @@ body,
   align-items: center;
   justify-content: center;
   gap: 0.06rem;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+/* Les <input> ont une largeur min intrinsèque (~20ch) : sans contrainte, le flex-wrap cassait la ligne au focus */
+.dock-period-unit .inline-editable.clock.dock-period-mm,
+.dock-period-unit .inline-editable.clock.dock-period-ss {
+  width: auto;
+  min-width: 2.75ch;
+  max-width: 5.5ch;
+}
+
+.dock-period-unit .inline-input.clock.dock-period-mm,
+.dock-period-unit .inline-input.clock.dock-period-ss {
+  box-sizing: content-box;
+  width: 3.25ch;
+  min-width: 2.75ch;
+  max-width: 5.5ch;
+}
+
+.dock-period-unit .inline-input.clock.dock-period-ss {
+  width: 3ch;
+  max-width: 4ch;
 }
 
 .dock-period-colon {
@@ -1207,7 +1288,18 @@ body,
 .period-row--dock {
   margin-top: 0;
   min-height: auto;
-  gap: clamp(0.5rem, 1.5vw, 1rem);
+  flex: 0 1 auto;
+  gap: clamp(0.45rem, 1.2vw, 0.85rem);
+}
+
+.display-bottom-dock-main .period-row--dock .period-label {
+  font-size: clamp(1.25rem, 2.2vw, 2rem);
+}
+
+.display-bottom-dock-main .period-row--dock .period-nav-btn {
+  width: clamp(2rem, 4.5vw, 3rem);
+  height: clamp(2rem, 4.5vw, 3rem);
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
 }
 
 .overlay-hotbar-inline .overlay-icon-btn {
@@ -1320,7 +1412,12 @@ html.contrast-high {
 
 @media (max-width: 1200px) {
   .inline-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .inline-grid .team-card--scoreboard.team-card--a,
+  .inline-grid .team-card--scoreboard.team-card--b {
+    justify-self: center;
   }
 
   .center-stack {
@@ -1336,7 +1433,7 @@ html.contrast-high {
   }
 
   .team-score {
-    font-size: clamp(3.2rem, 22vw, 10rem);
+    font-size: clamp(2.5rem, 18vw, 8rem);
   }
 
   .overlay-hotbar {
@@ -1372,19 +1469,27 @@ html.contrast-high {
   }
 
   .inline-grid {
-    grid-template-columns: 1fr minmax(260px, 0.75fr) 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 0.75fr) minmax(0, 1fr);
     grid-template-rows: auto auto;
   }
 
   .team-score {
-    font-size: clamp(5.8rem, 26vw, 14rem);
+    font-size: clamp(4.65rem, 21vw, 11.25rem);
   }
 }
 
 /* Hauteur limitée (ex. iPad 768px) : tout tient dans l’écran, espace vertical équilibré */
 @media (min-width: 1024px) and (max-height: 800px) {
   .display-inline {
-    padding: 4rem 1rem calc(0.8rem + clamp(5.5rem, 13vh, 8rem));
+    --display-inline-pad-x: max(
+      1rem,
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-right, 0px)
+    );
+    padding-top: 4rem;
+    padding-bottom: calc(0.8rem + clamp(5.5rem, 13vh, 8rem));
+    padding-left: var(--display-inline-pad-x);
+    padding-right: var(--display-inline-pad-x);
     min-height: 100vh;
     min-height: 100dvh;
     align-items: stretch;
@@ -1419,30 +1524,31 @@ html.contrast-high {
   }
 
   .team-card {
-    padding: 0.6rem 0.5rem;
-    max-height: min(52vh, 100%);
+    padding: 0.45rem 0.4rem;
+    width: min(100%, 42vh);
+    max-height: min(42vh, 100%);
   }
 
   .team-name {
-    font-size: clamp(1.4rem, 2.8vw, 2.8rem);
+    font-size: clamp(1.2rem, 2.4vw, 2.35rem);
   }
 
   .team-logo-frame {
-    min-height: clamp(4.25rem, 10vh, 6.75rem);
-    max-width: min(100%, 15rem);
+    min-height: clamp(3.5rem, 8.5vh, 5.5rem);
+    max-width: min(100%, 12.5rem);
   }
 
   .team-logo-img {
-    max-height: clamp(4.5rem, 12vh, 7.5rem);
+    max-height: clamp(3.65rem, 10vh, 6.25rem);
   }
 
   .team-score {
-    font-size: clamp(4.8rem, 21vw, 10.5rem);
+    font-size: clamp(3.85rem, 17vw, 8.5rem);
   }
 
   .score-side-btn {
-    width: clamp(2rem, 3.5vw, 3.5rem);
-    height: clamp(4rem, 10vw, 9rem);
+    width: clamp(1.75rem, 3vw, 3rem);
+    height: clamp(3.35rem, 8.5vw, 7.5rem);
   }
 
   .score-minus {

@@ -358,6 +358,7 @@ onUnmounted(() => {
       '--ghost-hover-opacity': String(match.ui.ghostHoverOpacity)
     }"
   >
+    <div class="display-inline-scale">
     <header class="display-header inline-header display-header--tiered">
       <InlineEditableText
         aria-label="Titre de l'impro"
@@ -666,10 +667,31 @@ onUnmounted(() => {
         />
       </article>
     </section>
+    </div>
 
     <footer class="display-bottom-dock" aria-label="Annonces et période">
       <div class="display-bottom-dock-center-wrap">
         <div class="display-bottom-dock-main">
+        <div class="period-row period-row--dock">
+          <button
+            type="button"
+            class="period-nav-btn"
+            aria-label="Période précédente"
+            @click="store.previousPeriod()"
+          >
+            ←
+          </button>
+          <p class="period-label">{{ displayPeriodLabel }}</p>
+          <button
+            type="button"
+            class="period-nav-btn"
+            aria-label="Période suivante"
+            @click="store.nextPeriod()"
+          >
+            →
+          </button>
+        </div>
+
         <article
           class="timer-card timer-card--dock timer-card--dock-period"
           :class="{
@@ -749,26 +771,6 @@ onUnmounted(() => {
             </div>
           </div>
         </article>
-
-        <div class="period-row period-row--dock">
-          <button
-            type="button"
-            class="period-nav-btn"
-            aria-label="Période précédente"
-            @click="store.previousPeriod()"
-          >
-            ←
-          </button>
-          <p class="period-label">{{ displayPeriodLabel }}</p>
-          <button
-            type="button"
-            class="period-nav-btn"
-            aria-label="Période suivante"
-            @click="store.nextPeriod()"
-          >
-            →
-          </button>
-        </div>
         </div>
       </div>
       <div class="overlay-hotbar-inline overlay-hotbar-inline--dock">
