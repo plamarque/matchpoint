@@ -330,39 +330,6 @@ onUnmounted(() => {
         :style="{ '--team-color': match.teamA.colorToken }"
       >
         <div class="team-card-top">
-          <img
-            v-if="match.teamA.logoDataUrl"
-            class="team-logo"
-            alt=""
-            :src="match.teamA.logoDataUrl"
-          />
-          <input
-            ref="logoInputA"
-            type="file"
-            class="team-logo-input"
-            accept="image/*"
-            tabindex="-1"
-            aria-hidden="true"
-            @change="(e) => onTeamLogoFile('A', e)"
-          />
-          <button
-            type="button"
-            class="ghost-hotspot team-logo-trigger"
-            aria-label="Choisir un logo équipe A"
-            title="Logo"
-            @click="openLogoPicker('A')"
-          >
-            {{ match.teamA.logoDataUrl ? "Logo" : "＋" }}
-          </button>
-          <button
-            v-if="match.teamA.logoDataUrl"
-            type="button"
-            class="ghost-hotspot team-logo-clear"
-            aria-label="Retirer le logo équipe A"
-            @click.stop="store.setTeamLogo('A', null)"
-          >
-            ×
-          </button>
           <InlineEditableText
             aria-label="Nom équipe A"
             class-name="team-name"
@@ -370,6 +337,54 @@ onUnmounted(() => {
             placeholder="Équipe A"
             @update:model-value="(value) => store.setTeamName('A', value)"
           />
+          <div class="team-logo-zone">
+            <input
+              ref="logoInputA"
+              type="file"
+              class="team-logo-input"
+              accept="image/*"
+              tabindex="-1"
+              aria-hidden="true"
+              @change="(e) => onTeamLogoFile('A', e)"
+            />
+            <div
+              class="team-logo-frame"
+              :class="{ 'team-logo-frame--filled': !!match.teamA.logoDataUrl }"
+            >
+              <template v-if="match.teamA.logoDataUrl">
+                <img
+                  class="team-logo-img"
+                  alt=""
+                  :src="match.teamA.logoDataUrl"
+                />
+                <button
+                  type="button"
+                  class="ghost-hotspot team-logo-hit"
+                  aria-label="Changer le logo équipe A"
+                  title="Changer le logo"
+                  @click="openLogoPicker('A')"
+                />
+                <button
+                  type="button"
+                  class="ghost-hotspot team-logo-clear"
+                  aria-label="Retirer le logo équipe A"
+                  @click.stop="store.setTeamLogo('A', null)"
+                >
+                  ×
+                </button>
+              </template>
+              <button
+                v-else
+                type="button"
+                class="team-logo-placeholder"
+                aria-label="Ajouter un logo équipe A — choisir une image"
+                title="Choisir une image"
+                @click="openLogoPicker('A')"
+              >
+                <span class="team-logo-glyph" aria-hidden="true">＋</span>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="score-wrap">
           <button
@@ -733,39 +748,6 @@ onUnmounted(() => {
         :style="{ '--team-color': match.teamB.colorToken }"
       >
         <div class="team-card-top">
-          <img
-            v-if="match.teamB.logoDataUrl"
-            class="team-logo"
-            alt=""
-            :src="match.teamB.logoDataUrl"
-          />
-          <input
-            ref="logoInputB"
-            type="file"
-            class="team-logo-input"
-            accept="image/*"
-            tabindex="-1"
-            aria-hidden="true"
-            @change="(e) => onTeamLogoFile('B', e)"
-          />
-          <button
-            type="button"
-            class="ghost-hotspot team-logo-trigger"
-            aria-label="Choisir un logo équipe B"
-            title="Logo"
-            @click="openLogoPicker('B')"
-          >
-            {{ match.teamB.logoDataUrl ? "Logo" : "＋" }}
-          </button>
-          <button
-            v-if="match.teamB.logoDataUrl"
-            type="button"
-            class="ghost-hotspot team-logo-clear"
-            aria-label="Retirer le logo équipe B"
-            @click.stop="store.setTeamLogo('B', null)"
-          >
-            ×
-          </button>
           <InlineEditableText
             aria-label="Nom équipe B"
             class-name="team-name"
@@ -773,6 +755,54 @@ onUnmounted(() => {
             placeholder="Équipe B"
             @update:model-value="(value) => store.setTeamName('B', value)"
           />
+          <div class="team-logo-zone">
+            <input
+              ref="logoInputB"
+              type="file"
+              class="team-logo-input"
+              accept="image/*"
+              tabindex="-1"
+              aria-hidden="true"
+              @change="(e) => onTeamLogoFile('B', e)"
+            />
+            <div
+              class="team-logo-frame"
+              :class="{ 'team-logo-frame--filled': !!match.teamB.logoDataUrl }"
+            >
+              <template v-if="match.teamB.logoDataUrl">
+                <img
+                  class="team-logo-img"
+                  alt=""
+                  :src="match.teamB.logoDataUrl"
+                />
+                <button
+                  type="button"
+                  class="ghost-hotspot team-logo-hit"
+                  aria-label="Changer le logo équipe B"
+                  title="Changer le logo"
+                  @click="openLogoPicker('B')"
+                />
+                <button
+                  type="button"
+                  class="ghost-hotspot team-logo-clear"
+                  aria-label="Retirer le logo équipe B"
+                  @click.stop="store.setTeamLogo('B', null)"
+                >
+                  ×
+                </button>
+              </template>
+              <button
+                v-else
+                type="button"
+                class="team-logo-placeholder"
+                aria-label="Ajouter un logo équipe B — choisir une image"
+                title="Choisir une image"
+                @click="openLogoPicker('B')"
+              >
+                <span class="team-logo-glyph" aria-hidden="true">＋</span>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="score-wrap">
           <button

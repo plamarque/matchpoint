@@ -265,20 +265,20 @@ body,
 
 .team-card-top {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.35rem 0.55rem;
+  gap: clamp(0.5rem, 1.4vh, 0.85rem);
   width: 100%;
   position: relative;
   z-index: 14;
 }
 
-.team-logo {
-  max-height: clamp(2rem, 4vh, 3rem);
-  max-width: min(35%, 5.5rem);
-  object-fit: contain;
-  flex-shrink: 0;
+.team-logo-zone {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  position: relative;
 }
 
 .team-logo-input {
@@ -289,22 +289,124 @@ body,
   pointer-events: none;
 }
 
-.team-logo-trigger,
-.team-logo-clear {
-  position: static;
-  transform: none;
-  padding: 0.15rem 0.45rem;
-  font-size: clamp(0.65rem, 1.1vw, 0.8rem);
-  border-radius: 8px;
+/* Zone logo identique gauche / droite : même largeur max et même hauteur mini */
+.team-logo-frame {
+  position: relative;
+  width: 100%;
+  max-width: min(100%, 17.5rem);
+  min-height: clamp(6rem, 15vh, 10rem);
+  border-radius: 14px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.team-logo-frame--filled {
+  border: 1px solid rgb(255 255 255 / 22%);
+  background: rgb(0 0 0 / 18%);
+  padding: clamp(0.45rem, 1.2vh, 0.7rem);
+}
+
+.team-logo-frame:not(.team-logo-frame--filled) {
+  border: 2px dashed rgb(255 255 255 / 30%);
+  background: rgb(0 0 0 / 12%);
+}
+
+.team-logo-img {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  max-height: clamp(5.5rem, 14vh, 9.25rem);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.team-logo-hit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: none;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
   opacity: var(--ghost-idle-opacity);
-  min-width: auto;
-  min-height: auto;
-  line-height: 1.2;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+.team-logo-hit:hover,
+.team-logo-hit:focus-visible {
+  opacity: var(--ghost-hover-opacity);
 }
 
 .team-logo-clear {
-  padding: 0.05rem 0.35rem;
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  padding: 0;
+  margin: 0;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 8px;
+  background: rgb(0 0 0 / 45%);
+  color: #fff;
   font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: var(--ghost-idle-opacity);
+}
+
+.team-logo-clear:hover,
+.team-logo-clear:focus-visible {
+  opacity: var(--ghost-hover-opacity);
+}
+
+/* Zone cliquable pleine ; seul le glyphe est visible (style proche des ghost / overlay) */
+.team-logo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: none;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.team-logo-glyph {
+  display: grid;
+  place-items: center;
+  width: clamp(2rem, 4.2vw, 2.85rem);
+  height: clamp(2rem, 4.2vw, 2.85rem);
+  border-radius: 50%;
+  border: 1px solid rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 20%);
+  opacity: var(--ghost-idle-opacity);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2.1vw, 1.4rem);
+  font-weight: 600;
+  line-height: 1;
+  transition:
+    opacity 150ms ease,
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+.team-logo-placeholder:hover .team-logo-glyph,
+.team-logo-placeholder:focus-visible .team-logo-glyph {
+  opacity: var(--ghost-hover-opacity);
+  background: rgb(255 255 255 / 28%);
+  transform: scale(1.02);
 }
 
 .sr-only {
@@ -326,8 +428,7 @@ body,
   letter-spacing: 0.08em;
   font-weight: 700;
   width: 100%;
-  justify-self: center;
-  align-self: start;
+  text-align: center;
   position: relative;
   z-index: 14;
   white-space: normal;
@@ -1144,6 +1245,15 @@ html.contrast-high {
 
   .team-name {
     font-size: clamp(1.4rem, 2.8vw, 2.8rem);
+  }
+
+  .team-logo-frame {
+    min-height: clamp(5rem, 12.5vh, 8rem);
+    max-width: min(100%, 15rem);
+  }
+
+  .team-logo-img {
+    max-height: clamp(4.5rem, 12vh, 7.5rem);
   }
 
   .team-score {

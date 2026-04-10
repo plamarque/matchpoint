@@ -15,7 +15,7 @@
 
 | Composant | Responsabilité |
 |----------|----------------|
-| **DisplayInline** | Affichage match, édition texte inline et contrôles opérationnels directs ; centre = un grand cadran (impro ou période) + second cadran compact pour l’autre chrono ; cartes équipe avec logo data URL optionnel (couleur équipe via le panneau ; pas d’aperçu maillot/carton) |
+| **DisplayInline** | Affichage match, édition texte inline et contrôles opérationnels directs ; centre = un grand cadran (impro ou période) + second cadran compact pour l’autre chrono ; cartes équipe : nom puis zone logo centrée sous le nom (data URL optionnelle, même gabarit gauche/droite ; couleur équipe via le panneau) |
 | **HotspotLayer** | Rendu et dispatch des hotspots globaux superposés |
 | **InlineEditableText** | Gestion click-to-edit, commit/rollback clavier |
 | **OverlayPanel** | Affichage plein écran des annonces (clic pour fermeture) |
