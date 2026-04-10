@@ -15,7 +15,7 @@
 
 | Composant | Responsabilité |
 |----------|----------------|
-| **DisplayInline** | Affichage match, édition texte inline et contrôles opérationnels directs ; centre = un grand cadran (impro ou période) + second cadran compact pour l’autre chrono ; cartes équipe avec logo data URL optionnel, couleur carton de vote, pictos maillot/carton |
+| **DisplayInline** | Affichage match, édition texte inline et contrôles opérationnels directs ; centre = un grand cadran (impro ou période) + second cadran compact pour l’autre chrono ; cartes équipe avec logo data URL optionnel (couleur équipe via le panneau ; pas d’aperçu maillot/carton) |
 | **HotspotLayer** | Rendu et dispatch des hotspots globaux superposés |
 | **InlineEditableText** | Gestion click-to-edit, commit/rollback clavier |
 | **OverlayPanel** | Affichage plein écran des annonces (clic pour fermeture) |
@@ -35,4 +35,4 @@
 - Contrôles fantômes visibles en permanence mais atténués, avec feedback hover renforcé.
 - Modèle pénalités manuel (3 pastilles par équipe), sans automatisme de score.
 - Réglage du chrono impro par paires de flèches séparées: minutes à gauche, secondes à droite.
-- Équipe : champs optionnels `logoDataUrl` (image inline pour offline) et `voteCardColor` (hex, défauts rouge/blanc gauche/droite) dans `TeamState`, sérialisés avec le match persisté et les snapshots remote.
+- Équipe : champs optionnels `logoDataUrl` (image inline pour offline) et `voteCardColor` (hex, défauts rouge/blanc gauche/droite, **sans contrôle ni aperçu** sur l’affichage principal) dans `TeamState`, sérialisés avec le match persisté et les snapshots remote.

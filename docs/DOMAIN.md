@@ -37,7 +37,7 @@ La correspondance entre **statut du match** et le **contenu de la zone chronomè
 - **MatchState**: statut, période, équipes, impro, timers, overlay, préférences UI.
 - **UiPrefs**: inclut opacité idle/hover des contrôles, échelle des hotspots et réglages de lisibilité.
 - **HotspotDefinition**: identifiant, label, action, position, dimensions, forme.
-- **Équipe (conceptuel)** : outre nom, score, couleur, pénalités — attributs optionnels **logo**, **couleurs de carton de vote** (personnalisation des défauts gauche/droite décrits en spec).
+- **Équipe (conceptuel)** : outre nom, score, couleur, pénalités — attribut optionnel **logo** ; le modèle peut encore porter une **couleur de carton de vote** (hex, défauts gauche/droite) pour persistance ou synchronisation, **sans affichage dédié** sur l’écran principal au sens de la spec actuelle.
 
 ## Règles métier
 
@@ -49,4 +49,4 @@ La correspondance entre **statut du match** et le **contenu de la zone chronomè
 6. Chrono impro configurable par minutes (pas unité) et secondes (`00`, `10`, `30`, `45`) via flèches dédiées.
 7. Période parmi `1`, `2`, `3`, `4`, `premiere`, `derniere`.
 8. À l’affichage projeté, **une seule** des deux lectures (impro ou période) occupe la zone chronomètre principale à un instant donné, selon la table *Phases et contenu de la zone chronomètre*.
-9. Couleurs de **carton de vote** : défaut **rouge** (équipe côté gauche de l’affichage) et **blanc** (équipe côté droit), **surcharge possible** par configuration par équipe.
+9. Couleurs de **carton de vote** (données modèle) : défaut **rouge** (équipe côté gauche) et **blanc** (équipe côté droit), **surcharge possible** en persistance ; **pas** d’UI sur l’affichage principal pour les régler ou les montrer (voir SPEC).

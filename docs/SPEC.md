@@ -12,7 +12,7 @@ La V1 fournit un pilotage **100% inline**: toutes les modifications se font dire
 - Contrôles fantômes **toujours visibles en semi-transparence**, avec renforcement au hover local.
 - 9 annonces overlays fixes type Gazoo, déclenchées depuis une barre d’icônes.
 - PWA installable, mode offline après premier chargement.
-- **Configuration d’équipe (optionnelle)** : logo et couleurs de rappel pour cartons de vote, sans écran obligatoire distinct du flux principal si ce n’est pas requis par le produit.
+- **Configuration d’équipe (optionnelle)** : logo par équipe, sans écran obligatoire distinct du flux principal si ce n’est pas requis par le produit.
 
 - **Contrôle à distance (optionnel)** : un bouton discret sur l’affichage ouvre un QR code (affiché seulement si une session distante a été créée avec succès) ; le téléphone peut ouvrir l’app de contrôle (`/control` ou `/remote`) et rejoindre la session via un code pour piloter l’affichage. Pas d’app à installer à l’avance (scan = ouverture en ligne ou PWA déjà installée). En l’absence de backend ou d’Internet, la télécommande est indisponible sans bloquer le reste de l’application.
 
@@ -57,7 +57,7 @@ La V1 fournit un pilotage **100% inline**: toutes les modifications se font dire
 - Les blocs score adoptent une présentation de type **panneau / cadran d’affichage** (skeuomorphisme léger : relief, matière, éventuelle perspective ou inclinaison) pour évoquer un tableau physique plutôt qu’un simple cadre plat.
 - Les **pénalités** restent **rattachées** visuellement à chaque panneau équipe (pastilles ou équivalent).
 
-6. **Configuration : logos et couleurs de carton (optionnel)**
+6. **Configuration : logos (optionnel)**
 
 - Lors de la **préparation du match** (configuration avant ou en début de soirée, sans imposer un écran séparé), l’opérateur peut associer **optionnellement** un **logo** à chaque équipe.
 - Sans logo, le comportement reste centré sur **nom** et **couleur d’équipe** comme aujourd’hui.
@@ -67,8 +67,7 @@ La V1 fournit un pilotage **100% inline**: toutes les modifications se font dire
 7. **Hiérarchie visuelle et repères équipe**
 
 - Les **lignes d’information centrales** (type d’impro, titre, catégorie, durée annoncée, etc.) utilisent une **hiérarchie visuelle claire** : couleurs ou styles distincts pour que le spectateur distingue immédiatement le **titre** des **métadonnées**, sans imposer de palette figée dans cette spec.
-- **Maillot** : chaque équipe bénéficie d’un **rappel visuel** de sa couleur de maillot (ou équivalent), **aligné** sur la **couleur d’équipe** déjà gérée (pictogramme, picto ou bandeau).
-- **Cartons de vote** : chaque équipe a un **rappel de la couleur de carton** utilisée pour le vote public. **Par défaut** : **rouge** pour l’équipe affichée à **gauche**, **blanc** pour l’équipe affichée à **droite** (convention fréquente). L’opérateur peut **personnaliser** ces deux couleurs si la ligue ou la soirée impose une autre convention.
+- Sur l’**affichage principal**, le **repère couleur équipe** pour le public repose sur la **couleur du panneau score** (et le **logo** si présent) ; **pas** de pictogramme maillot ni d’aperçu couleur de carton de vote à l’écran.
 
 8. **Annonces**
 - Déclenchement depuis barre d’icônes fantômes en haut.

@@ -67,7 +67,7 @@ export interface TeamState {
   penalties: number;
   /** Image en data URL (optionnel), pour affichage et persistance offline. */
   logoDataUrl: string | null;
-  /** Couleur du carton de vote (hex), défaut gauche/droite selon DOMAIN. */
+  /** Couleur du carton de vote (hex), défaut gauche/droite selon DOMAIN ; persistée, sans affichage sur l’écran principal. */
   voteCardColor: string;
 }
 

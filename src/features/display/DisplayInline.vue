@@ -327,11 +327,9 @@ onUnmounted(() => {
       <div class="score-grid-label score-grid-label--type" aria-hidden="true" />
       <article
         class="team-card team-card--scoreboard team-card--a"
-        :style="{ '--team-color': match.teamA.colorToken, '--vote-card': match.teamA.voteCardColor }"
+        :style="{ '--team-color': match.teamA.colorToken }"
       >
         <div class="team-card-top">
-          <span class="team-jersey" aria-hidden="true" title="Couleur maillot" />
-          <span class="team-vote-card" aria-hidden="true" title="Carton de vote" />
           <img
             v-if="match.teamA.logoDataUrl"
             class="team-logo"
@@ -410,15 +408,6 @@ onUnmounted(() => {
           title="Couleur"
           @click.stop="store.cycleTeamColor('A')"
         />
-        <label class="ghost-hotspot team-vote-color-wrap" title="Couleur carton de vote">
-          <span class="sr-only">Couleur carton de vote équipe A</span>
-          <input
-            class="team-vote-color-input"
-            type="color"
-            :value="match.teamA.voteCardColor"
-            @input="(e) => store.setVoteCardColor('A', (e.target as HTMLInputElement).value)"
-          />
-        </label>
       </article>
 
       <section class="center-stack">
@@ -741,11 +730,9 @@ onUnmounted(() => {
 
       <article
         class="team-card team-card--scoreboard team-card--b"
-        :style="{ '--team-color': match.teamB.colorToken, '--vote-card': match.teamB.voteCardColor }"
+        :style="{ '--team-color': match.teamB.colorToken }"
       >
         <div class="team-card-top">
-          <span class="team-jersey" aria-hidden="true" title="Couleur maillot" />
-          <span class="team-vote-card" aria-hidden="true" title="Carton de vote" />
           <img
             v-if="match.teamB.logoDataUrl"
             class="team-logo"
@@ -824,15 +811,6 @@ onUnmounted(() => {
           title="Couleur"
           @click.stop="store.cycleTeamColor('B')"
         />
-        <label class="ghost-hotspot team-vote-color-wrap team-vote-color-wrap--right" title="Couleur carton de vote">
-          <span class="sr-only">Couleur carton de vote équipe B</span>
-          <input
-            class="team-vote-color-input"
-            type="color"
-            :value="match.teamB.voteCardColor"
-            @input="(e) => store.setVoteCardColor('B', (e.target as HTMLInputElement).value)"
-          />
-        </label>
       </article>
     </section>
 
