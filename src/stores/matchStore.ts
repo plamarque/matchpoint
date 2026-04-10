@@ -23,7 +23,7 @@ const defaultUi = {
   showControlHints: false,
   lastFullscreenChoice: false,
   paletteSelection: "classic",
-  ghostIdleOpacity: 0,
+  ghostIdleOpacity: 0.05,
   ghostHoverOpacity: 0.26,
   hotspotScale: 1
 };

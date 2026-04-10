@@ -7,7 +7,8 @@
   --success: #64df9e;
   --radius: 18px;
   --display-scale: 1;
-  --ghost-idle-opacity: 0;
+  /* > 0 : léger repère sans survol ; rester plus bas que --ghost-hover-opacity */
+  --ghost-idle-opacity: 0.05;
   --ghost-hover-opacity: 0.26;
   --font-display: "Archivo Black", "Avenir Next Condensed", "Impact", sans-serif;
   --font-ui: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
@@ -1336,8 +1337,8 @@ html {
 
 .overlay-hotbar-inline .overlay-icon-btn {
   pointer-events: auto;
-  /* Icônes annonces : rester légèrement visibles sans hover pour viser le bon bouton */
-  opacity: max(var(--ghost-idle-opacity), 0.1);
+  /* Icônes annonces : même niveau « idle » que les autres zones fantômes */
+  opacity: max(var(--ghost-idle-opacity), 0.04);
 }
 
 .overlay-hotbar-inline .overlay-icon-btn:hover,

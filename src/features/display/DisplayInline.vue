@@ -137,9 +137,6 @@ const periodDockRunning = computed(() =>
   primaryChronoIsImpro.value ? secondaryTimerRunning.value : primaryTimerRunning.value
 );
 
-/** TEMP : opacité idle minimale pour repérer les boutons sans survol — à retirer quand l’UI est figée. */
-const ghostIdleForDebug = computed(() => Math.max(0.34, match.value.ui.ghostIdleOpacity));
-
 const penaltySlots = [1, 2, 3] as const;
 const overlayEntries = computed(() => Object.entries(store.overlayLabels) as Array<[string, string]>);
 
@@ -354,7 +351,7 @@ onUnmounted(() => {
     class="display-inline"
     :style="{
       '--display-scale': String(match.ui.displayScale),
-      '--ghost-idle-opacity': String(ghostIdleForDebug),
+      '--ghost-idle-opacity': String(match.ui.ghostIdleOpacity),
       '--ghost-hover-opacity': String(match.ui.ghostHoverOpacity)
     }"
   >
@@ -797,7 +794,7 @@ onUnmounted(() => {
 
     <HotspotLayer
       :hotspots="hotspots"
-      :idle-opacity="ghostIdleForDebug"
+      :idle-opacity="match.ui.ghostIdleOpacity"
       :hover-opacity="match.ui.ghostHoverOpacity"
       :hotspot-scale="match.ui.hotspotScale"
       @action="applyAction"
@@ -807,7 +804,7 @@ onUnmounted(() => {
       :model-value="store.showRemoteQrModal"
       @update:model-value="store.setShowRemoteQrModal"
       :session-info="sessionInfo"
-      :idle-opacity="ghostIdleForDebug"
+      :idle-opacity="match.ui.ghostIdleOpacity"
       :hover-opacity="match.ui.ghostHoverOpacity"
       :hotspot-scale="match.ui.hotspotScale"
     />
