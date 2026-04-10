@@ -9,7 +9,6 @@ import RemoteControlQR from "@/features/display/RemoteControlQR.vue";
 import { buildSnapshot } from "@/remote/stateSnapshot";
 import { useRemoteChannel } from "@/remote/useRemoteChannel";
 import { isPrimaryChronoImpro } from "@/services/displayTimer";
-import { formatClock, parseClock } from "@/services/timerService";
 import { useMatchStore } from "@/stores/matchStore";
 import type { HotspotDefinition, OverlayKey, TeamKey } from "@/types/match";
 import { useKeyboardShortcuts } from "@/utils/useKeyboardShortcuts";
@@ -144,10 +143,32 @@ const ghostIdleForDebug = computed(() => Math.max(0.34, match.value.ui.ghostIdle
 const penaltySlots = [1, 2, 3] as const;
 const overlayEntries = computed(() => Object.entries(store.overlayLabels) as Array<[string, string]>);
 
-const onImproRemainingCommit = (value: string) => {
-  const sec = parseClock(value);
-  if (sec !== null) store.setImproRemaining(sec);
+const improMinutesPadded = computed(() => {
+  const m = Math.floor(match.value.impro.timer.remainingSeconds / 60);
+  return String(Math.max(0, m)).padStart(2, "0");
+});
+
+const improSecondsPadded = computed(() => {
+  const s = match.value.impro.timer.remainingSeconds % 60;
+  return String(s).padStart(2, "0");
+});
+
+const onImproMinutesCommit = (value: string) => {
+  const raw = parseInt(value.replace(/\D/g, ""), 10);
+  if (Number.isNaN(raw)) return;
+  const mins = Math.max(0, Math.min(999, raw));
+  const sec = match.value.impro.timer.remainingSeconds % 60;
+  store.setImproRemaining(mins * 60 + sec);
 };
+
+const onImproSecondsCommit = (value: string) => {
+  const raw = parseInt(value.replace(/\D/g, ""), 10);
+  if (Number.isNaN(raw)) return;
+  const secOnly = Math.max(0, Math.min(59, raw));
+  const mins = Math.floor(match.value.impro.timer.remainingSeconds / 60);
+  store.setImproRemaining(mins * 60 + secOnly);
+};
+
 const periodMinutesPadded = computed(() => {
   const m = Math.floor(match.value.periodTimer.remainingSeconds / 60);
   return String(Math.max(0, m)).padStart(2, "0");
@@ -445,45 +466,58 @@ onUnmounted(() => {
       </article>
 
       <section class="center-stack">
-        <div class="center-stack-category">
-          <InlineEditableText
-            aria-label="Catégorie"
-            class-name="category-inline category-inline--center-stack"
-            :model-value="match.impro.category"
-            placeholder="Catégorie"
-            @update:model-value="store.setCategory"
-          />
-        </div>
+        <div class="center-stack-meta">
+          <div class="center-stack-category">
+            <InlineEditableText
+              aria-label="Catégorie"
+              class-name="category-inline category-inline--center-stack"
+              :model-value="match.impro.category"
+              placeholder="Catégorie"
+              @update:model-value="store.setCategory"
+            />
+          </div>
 
-        <div class="center-stack-impro-type">
-          <button
-            class="inline-editable impro-type-inline impro-type-inline--center-stack"
-            :class="{ 'impro-type-inline--filled': isImproTypeFilled }"
-            type="button"
-            aria-label="Type d'impro (cliquer pour changer)"
-            @click="store.toggleImproType"
-          >
-            {{ improTypeLabel }}
-          </button>
+          <div class="center-stack-impro-type">
+            <button
+              class="inline-editable impro-type-inline impro-type-inline--center-stack"
+              :class="{ 'impro-type-inline--filled': isImproTypeFilled }"
+              type="button"
+              aria-label="Type d'impro (cliquer pour changer)"
+              @click="store.toggleImproType"
+            >
+              {{ improTypeLabel }}
+            </button>
+          </div>
         </div>
 
         <article
-          v-if="primaryChronoIsImpro"
-          class="timer-card timer-card--primary"
-          :class="{ running: primaryTimerRunning }"
+          class="timer-card"
+          :class="[
+            primaryChronoIsImpro ? 'timer-card--primary' : 'timer-card--compact',
+            {
+              running: primaryChronoIsImpro ? primaryTimerRunning : secondaryTimerRunning
+            }
+          ]"
         >
-          <div class="impro-clock-layout">
-            <div class="impro-arrow-pair">
+          <div class="dock-period-clock-row">
+            <div class="dock-period-unit">
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot arrow-btn dock-period-arrow"
                 type="button"
                 aria-label="Minutes impro +"
                 @click="store.nudgeImproMinutes(1)"
               >
                 ▲
               </button>
+              <InlineEditableText
+                aria-label="Minutes impro"
+                class-name="clock inline-editable-clock dock-period-mm"
+                :model-value="improMinutesPadded"
+                placeholder="00"
+                @update:model-value="onImproMinutesCommit"
+              />
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot arrow-btn dock-period-arrow"
                 type="button"
                 aria-label="Minutes impro -"
                 @click="store.nudgeImproMinutes(-1)"
@@ -491,26 +525,25 @@ onUnmounted(() => {
                 ▼
               </button>
             </div>
-
-            <InlineEditableText
-              aria-label="Temps restant impro"
-              class-name="clock inline-editable-clock"
-              :model-value="formatClock(match.impro.timer.remainingSeconds)"
-              placeholder="0:00"
-              @update:model-value="onImproRemainingCommit"
-            />
-
-            <div class="impro-arrow-pair">
+            <span class="dock-period-colon" aria-hidden="true">:</span>
+            <div class="dock-period-unit">
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot arrow-btn dock-period-arrow"
                 type="button"
                 aria-label="Secondes impro +"
                 @click="store.nudgeImproSecondsStep(1)"
               >
                 ▲
               </button>
+              <InlineEditableText
+                aria-label="Secondes impro"
+                class-name="clock inline-editable-clock dock-period-ss"
+                :model-value="improSecondsPadded"
+                placeholder="00"
+                @update:model-value="onImproSecondsCommit"
+              />
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot arrow-btn dock-period-arrow"
                 type="button"
                 aria-label="Secondes impro -"
                 @click="store.nudgeImproSecondsStep(-1)"
@@ -518,96 +551,24 @@ onUnmounted(() => {
                 ▼
               </button>
             </div>
-          </div>
-          <div class="timer-controls-row">
-            <button
-              class="ghost-hotspot timer-action-btn"
-              type="button"
-              aria-label="Play/Pause impro"
-              @click="store.toggleImpro"
-            >
-              {{ improPlayPauseIcon }}
-            </button>
-            <button
-              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
-              type="button"
-              aria-label="Reset impro"
-              @click="store.resetImpro"
-            >
-              ↺
-            </button>
-          </div>
-        </article>
-
-        <article
-          v-if="!primaryChronoIsImpro"
-          class="timer-card timer-card--compact"
-          :class="{ running: secondaryTimerRunning }"
-        >
-          <div class="impro-clock-layout">
-            <div class="impro-arrow-pair">
+            <div class="dock-period-side-actions">
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot timer-action-btn"
                 type="button"
-                aria-label="Minutes impro +"
-                @click="store.nudgeImproMinutes(1)"
+                aria-label="Play/Pause impro"
+                @click="store.toggleImpro"
               >
-                ▲
+                {{ improPlayPauseIcon }}
               </button>
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
                 type="button"
-                aria-label="Minutes impro -"
-                @click="store.nudgeImproMinutes(-1)"
+                aria-label="Reset impro"
+                @click="store.resetImpro"
               >
-                ▼
+                ↺
               </button>
             </div>
-
-            <InlineEditableText
-              aria-label="Temps restant impro"
-              class-name="clock inline-editable-clock"
-              :model-value="formatClock(match.impro.timer.remainingSeconds)"
-              placeholder="0:00"
-              @update:model-value="onImproRemainingCommit"
-            />
-
-            <div class="impro-arrow-pair">
-              <button
-                class="ghost-hotspot arrow-btn"
-                type="button"
-                aria-label="Secondes impro +"
-                @click="store.nudgeImproSecondsStep(1)"
-              >
-                ▲
-              </button>
-              <button
-                class="ghost-hotspot arrow-btn"
-                type="button"
-                aria-label="Secondes impro -"
-                @click="store.nudgeImproSecondsStep(-1)"
-              >
-                ▼
-              </button>
-            </div>
-          </div>
-          <div class="timer-controls-row">
-            <button
-              class="ghost-hotspot timer-action-btn"
-              type="button"
-              aria-label="Play/Pause impro"
-              @click="store.toggleImpro"
-            >
-              {{ improPlayPauseIcon }}
-            </button>
-            <button
-              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
-              type="button"
-              aria-label="Reset impro"
-              @click="store.resetImpro"
-            >
-              ↺
-            </button>
           </div>
         </article>
       </section>
