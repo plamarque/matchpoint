@@ -148,9 +148,30 @@ const onImproRemainingCommit = (value: string) => {
   const sec = parseClock(value);
   if (sec !== null) store.setImproRemaining(sec);
 };
-const onPeriodRemainingCommit = (value: string) => {
-  const sec = parseClock(value);
-  if (sec !== null) store.setPeriodRemaining(sec);
+const periodMinutesPadded = computed(() => {
+  const m = Math.floor(match.value.periodTimer.remainingSeconds / 60);
+  return String(Math.max(0, m)).padStart(2, "0");
+});
+
+const periodSecondsPadded = computed(() => {
+  const s = match.value.periodTimer.remainingSeconds % 60;
+  return String(s).padStart(2, "0");
+});
+
+const onPeriodMinutesDockCommit = (value: string) => {
+  const raw = parseInt(value.replace(/\D/g, ""), 10);
+  if (Number.isNaN(raw)) return;
+  const mins = Math.max(0, Math.min(999, raw));
+  const sec = match.value.periodTimer.remainingSeconds % 60;
+  store.setPeriodRemaining(mins * 60 + sec);
+};
+
+const onPeriodSecondsDockCommit = (value: string) => {
+  const raw = parseInt(value.replace(/\D/g, ""), 10);
+  if (Number.isNaN(raw)) return;
+  const secOnly = Math.max(0, Math.min(59, raw));
+  const mins = Math.floor(match.value.periodTimer.remainingSeconds / 60);
+  store.setPeriodRemaining(mins * 60 + secOnly);
 };
 
 const overlayIcon = (key: string): string => {
@@ -695,18 +716,25 @@ onUnmounted(() => {
             'timer-card--dock-period--focal': !primaryChronoIsImpro
           }"
         >
-          <div class="impro-clock-layout impro-clock-layout--dock">
-            <div class="impro-arrow-pair">
+          <div class="dock-period-clock-row">
+            <div class="dock-period-unit">
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot arrow-btn dock-period-arrow"
                 type="button"
                 aria-label="Minutes période +"
                 @click="store.nudgePeriodPreset(1)"
               >
                 ▲
               </button>
+              <InlineEditableText
+                aria-label="Minutes période"
+                class-name="clock inline-editable-clock dock-period-mm"
+                :model-value="periodMinutesPadded"
+                placeholder="00"
+                @update:model-value="onPeriodMinutesDockCommit"
+              />
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot arrow-btn dock-period-arrow"
                 type="button"
                 aria-label="Minutes période -"
                 @click="store.nudgePeriodPreset(-1)"
@@ -714,26 +742,25 @@ onUnmounted(() => {
                 ▼
               </button>
             </div>
-
-            <InlineEditableText
-              aria-label="Temps restant période"
-              class-name="clock inline-editable-clock"
-              :model-value="formatClock(match.periodTimer.remainingSeconds)"
-              placeholder="0:00"
-              @update:model-value="onPeriodRemainingCommit"
-            />
-
-            <div class="impro-arrow-pair">
+            <span class="dock-period-colon" aria-hidden="true">:</span>
+            <div class="dock-period-unit">
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot arrow-btn dock-period-arrow"
                 type="button"
                 aria-label="Secondes période +"
                 @click="store.nudgePeriodSecondsStep(1)"
               >
                 ▲
               </button>
+              <InlineEditableText
+                aria-label="Secondes période"
+                class-name="clock inline-editable-clock dock-period-ss"
+                :model-value="periodSecondsPadded"
+                placeholder="00"
+                @update:model-value="onPeriodSecondsDockCommit"
+              />
               <button
-                class="ghost-hotspot arrow-btn"
+                class="ghost-hotspot arrow-btn dock-period-arrow"
                 type="button"
                 aria-label="Secondes période -"
                 @click="store.nudgePeriodSecondsStep(-1)"
@@ -741,24 +768,24 @@ onUnmounted(() => {
                 ▼
               </button>
             </div>
-          </div>
-          <div class="timer-controls-row timer-controls-row--dock">
-            <button
-              class="ghost-hotspot timer-action-btn"
-              type="button"
-              aria-label="Play/Pause période"
-              @click="store.togglePeriod"
-            >
-              {{ periodPlayPauseIcon }}
-            </button>
-            <button
-              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
-              type="button"
-              aria-label="Reset période"
-              @click="store.resetPeriod"
-            >
-              ↺
-            </button>
+            <div class="dock-period-side-actions">
+              <button
+                class="ghost-hotspot timer-action-btn"
+                type="button"
+                aria-label="Play/Pause période"
+                @click="store.togglePeriod"
+              >
+                {{ periodPlayPauseIcon }}
+              </button>
+              <button
+                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+                type="button"
+                aria-label="Reset période"
+                @click="store.resetPeriod"
+              >
+                ↺
+              </button>
+            </div>
           </div>
         </article>
 

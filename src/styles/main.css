@@ -1091,20 +1091,43 @@ body,
     0 1px 8px rgb(0 0 0 / 35%);
 }
 
-.timer-card--dock .impro-clock-layout--dock {
-  margin-top: 0;
+.dock-period-clock-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.35rem clamp(0.45rem, 1.5vw, 0.75rem);
+  width: 100%;
 }
 
-.impro-clock-layout--dock {
-  gap: clamp(0.35rem, 1.2vw, 0.75rem);
+.dock-period-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.06rem;
 }
 
-.timer-card--dock .timer-controls-row--dock {
-  position: relative;
-  bottom: auto;
-  left: auto;
-  right: auto;
-  margin-top: 0.15rem;
+.dock-period-colon {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3.8vw, 2.45rem);
+  line-height: 1;
+  align-self: center;
+  opacity: 0.95;
+}
+
+.timer-card--dock-period--focal .dock-period-colon {
+  font-size: clamp(2rem, 5.5vw, 3.75rem);
+}
+
+.dock-period-side-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(0.35rem, 1.2vw, 0.55rem);
+  margin-left: clamp(0.25rem, 1.2vw, 0.75rem);
+  flex-shrink: 0;
 }
 
 .timer-card--dock .ghost-hotspot.timer-action-btn,
@@ -1122,22 +1145,26 @@ body,
   font-size: clamp(2rem, 4.5vw, 2.85rem);
 }
 
-.timer-card--dock-period .clock {
+.timer-card--dock-period .dock-period-mm.clock,
+.timer-card--dock-period .dock-period-ss.clock {
   font-size: clamp(1.4rem, 3.8vw, 2.45rem);
-  margin: 0.05rem 0 0;
+  margin: 0;
+  min-width: 2.6ch;
+  text-align: center;
 }
 
-.timer-card--dock-period--focal .clock {
+.timer-card--dock-period--focal .dock-period-mm.clock,
+.timer-card--dock-period--focal .dock-period-ss.clock {
   font-size: clamp(2rem, 5.5vw, 3.75rem);
 }
 
-.timer-card--dock-period .arrow-btn {
+.timer-card--dock-period .dock-period-arrow {
   width: clamp(1.65rem, 2.9vw, 2.5rem);
   height: clamp(1.4rem, 2.5vw, 2.1rem);
   font-size: clamp(0.8rem, 1.4vw, 1.15rem);
 }
 
-.timer-card--dock-period--focal .arrow-btn {
+.timer-card--dock-period--focal .dock-period-arrow {
   width: clamp(2.1rem, 3.6vw, 3rem);
   height: clamp(1.75rem, 3vw, 2.5rem);
   font-size: clamp(1rem, 1.8vw, 1.45rem);
