@@ -28,6 +28,11 @@ const teamNameA = ref("Rouges");
 const teamNameB = ref("Bleus");
 const teamColorA = ref(TEAM_PALETTES.classic[0]);
 const teamColorB = ref(TEAM_PALETTES.classic[1]);
+const teamLogoA = ref<string | null>(null);
+const teamLogoB = ref<string | null>(null);
+
+const logoInputA = ref<HTMLInputElement | null>(null);
+const logoInputB = ref<HTMLInputElement | null>(null);
 
 /** Type d’impro (suivi local). */
 const improType = ref<"mixte" | "comparee" | "none">("mixte");
@@ -294,6 +299,10 @@ function applyState(payload: RemoteStateSnapshot) {
   teamNameB.value = tB?.name?.trim() || "Bleus";
   teamColorA.value = tA?.colorToken ?? TEAM_PALETTES.classic[0];
   teamColorB.value = tB?.colorToken ?? TEAM_PALETTES.classic[1];
+  const la = tA?.logoDataUrl;
+  const lb = tB?.logoDataUrl;
+  teamLogoA.value = typeof la === "string" && la.length > 0 ? la : null;
+  teamLogoB.value = typeof lb === "string" && lb.length > 0 ? lb : null;
 
   const idx = Number(payload.periodIndex);
   periodIndex.value = Number.isFinite(idx) && idx >= 0 && idx < PERIOD_LABELS.length ? idx : 0;
@@ -430,6 +439,8 @@ function send(cmd: RemoteCommand) {
 function resetMatch() {
   teamColorA.value = TEAM_PALETTES.classic[0];
   teamColorB.value = TEAM_PALETTES.classic[1];
+  teamLogoA.value = null;
+  teamLogoB.value = null;
   send({ type: "reset_match" });
 }
 
@@ -458,6 +469,29 @@ function cycleTeamColor(team: TeamKey) {
   if (team === "A") teamColorA.value = next;
   else teamColorB.value = next;
   send({ type: "cycle_team_color", team });
+}
+
+function openLogoPicker(team: TeamKey) {
+  const el = team === "A" ? logoInputA.value : logoInputB.value;
+  el?.click();
+}
+
+function onTeamLogoFile(team: TeamKey, event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = "";
+  if (!file || !file.type.startsWith("image/")) {
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const data = reader.result;
+    if (typeof data !== "string") return;
+    if (team === "A") teamLogoA.value = data;
+    else teamLogoB.value = data;
+    send({ type: "set_team_logo", team, dataUrl: data });
+  };
+  reader.readAsDataURL(file);
 }
 
 function sendSetImproType(value: "mixte" | "comparee" | "none") {
@@ -652,6 +686,26 @@ function onCustomAnnounceButtonClick() {
                   @click="cycleTeamColor('A')"
                 />
                 <input
+                  ref="logoInputA"
+                  type="file"
+                  class="control-team-logo-input"
+                  accept="image/*"
+                  tabindex="-1"
+                  aria-hidden="true"
+                  @change="(e) => onTeamLogoFile('A', e)"
+                />
+                <button
+                  type="button"
+                  class="control-team-logo-btn"
+                  :class="{ 'control-team-logo-btn--filled': !!teamLogoA }"
+                  :aria-label="teamLogoA ? 'Changer le logo équipe A — choisir une image' : 'Ajouter un logo équipe A — choisir une image'"
+                  title="Logo"
+                  @click="openLogoPicker('A')"
+                >
+                  <img v-if="teamLogoA" class="control-team-logo-img" alt="" :src="teamLogoA" />
+                  <span v-else class="control-team-logo-glyph" aria-hidden="true">＋</span>
+                </button>
+                <input
                   v-model="teamNameA"
                   type="text"
                   class="control-input control-team-name-input"
@@ -694,6 +748,26 @@ function onCustomAnnounceButtonClick() {
                   title="Couleur"
                   @click="cycleTeamColor('B')"
                 />
+                <input
+                  ref="logoInputB"
+                  type="file"
+                  class="control-team-logo-input"
+                  accept="image/*"
+                  tabindex="-1"
+                  aria-hidden="true"
+                  @change="(e) => onTeamLogoFile('B', e)"
+                />
+                <button
+                  type="button"
+                  class="control-team-logo-btn"
+                  :class="{ 'control-team-logo-btn--filled': !!teamLogoB }"
+                  :aria-label="teamLogoB ? 'Changer le logo équipe B — choisir une image' : 'Ajouter un logo équipe B — choisir une image'"
+                  title="Logo"
+                  @click="openLogoPicker('B')"
+                >
+                  <img v-if="teamLogoB" class="control-team-logo-img" alt="" :src="teamLogoB" />
+                  <span v-else class="control-team-logo-glyph" aria-hidden="true">＋</span>
+                </button>
                 <input
                   v-model="teamNameB"
                   type="text"
@@ -1306,6 +1380,7 @@ function onCustomAnnounceButtonClick() {
   }
 
   .control-team-color-btn,
+  .control-team-logo-btn,
   .control-penalty-dot {
     width: 40px;
     height: 40px;
@@ -1329,6 +1404,7 @@ function onCustomAnnounceButtonClick() {
 }
 
 .control-team-head {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1362,6 +1438,52 @@ function onCustomAnnounceButtonClick() {
 
 .control-team-color-btn:hover {
   filter: brightness(1.1);
+}
+
+.control-team-logo-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.control-team-logo-btn {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 8px;
+  border: 2px solid var(--text-muted);
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-raised, #2a2a2e);
+  overflow: hidden;
+}
+
+.control-team-logo-btn--filled {
+  border-color: var(--text-muted);
+  padding: 2px;
+}
+
+.control-team-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.control-team-logo-glyph {
+  font-size: 1.35rem;
+  font-weight: 300;
+  line-height: 1;
+  color: var(--text-muted);
 }
 
 .control-score-stepper {

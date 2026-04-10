@@ -25,6 +25,9 @@ export function runRemoteCommand(cmd: RemoteCommand, store: MatchStore): void {
     case "set_team_name":
       s.setTeamName(cmd.team, cmd.value);
       return;
+    case "set_team_logo":
+      s.setTeamLogo(cmd.team, cmd.dataUrl);
+      return;
     case "cycle_team_color":
       s.cycleTeamColor(cmd.team);
       return;

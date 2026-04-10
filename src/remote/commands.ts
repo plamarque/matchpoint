@@ -57,6 +57,7 @@ export type RemoteCommand =
   | { type: "penalty_down"; team: TeamKey }
   | { type: "penalty_set"; team: TeamKey; level: number }
   | { type: "set_team_name"; team: TeamKey; value: string }
+  | { type: "set_team_logo"; team: TeamKey; dataUrl: string | null }
   | { type: "cycle_team_color"; team: TeamKey }
   | { type: "set_palette"; palette: string }
   | { type: "set_theme"; value: string }
