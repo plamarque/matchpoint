@@ -343,17 +343,17 @@ html {
   pointer-events: none;
 }
 
-/* Zone logo identique gauche / droite : même largeur max et même hauteur mini */
+/* Zone logo identique gauche / droite : carré, plus grand que l’historique 14.5rem */
 .team-logo-frame {
   position: relative;
-  width: 100%;
-  max-width: min(100%, 14.5rem);
-  min-height: clamp(4rem, 10vh, 7rem);
+  width: min(100%, 20rem);
+  aspect-ratio: 1 / 1;
   border-radius: 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .team-logo-frame--filled {
@@ -374,7 +374,8 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 100%;
+  width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
   border: none;
@@ -395,10 +396,8 @@ html {
 .team-logo-img {
   position: relative;
   display: block;
-  max-width: 100%;
-  max-height: clamp(4.25rem, 11.5vh, 7.5rem);
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   pointer-events: none;
   vertical-align: middle;
@@ -1567,12 +1566,8 @@ html.contrast-high {
   }
 
   .team-logo-frame {
-    min-height: clamp(3.5rem, 8.5vh, 5.5rem);
-    max-width: min(100%, 12.5rem);
-  }
-
-  .team-logo-img {
-    max-height: clamp(3.65rem, 10vh, 6.25rem);
+    width: min(100%, 17rem);
+    aspect-ratio: 1 / 1;
   }
 
   .team-score {
