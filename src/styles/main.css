@@ -572,9 +572,13 @@ body,
 }
 
 .center-stack .timer-card--compact .timer-action-btn {
-  width: clamp(1.85rem, 4vw, 2.5rem);
-  height: clamp(1.85rem, 4vw, 2.5rem);
-  font-size: clamp(1rem, 2.5vw, 1.45rem);
+  width: clamp(2.5rem, 5vw, 3.35rem);
+  height: clamp(2.5rem, 5vw, 3.35rem);
+  font-size: clamp(1.35rem, 3.2vw, 2rem);
+}
+
+.center-stack .timer-card--compact .timer-action-btn--reset {
+  font-size: clamp(1.85rem, 4vw, 2.65rem);
 }
 
 .center-stack .timer-card--primary .impro-clock-layout {
@@ -871,10 +875,10 @@ body,
 .timer-action-btn {
   position: static;
   transform: none;
-  width: clamp(2.5rem, 5.5vw, 3.5rem);
-  height: clamp(2.5rem, 5.5vw, 3.5rem);
+  width: clamp(3.35rem, 7.5vw, 5rem);
+  height: clamp(3.35rem, 7.5vw, 5rem);
   border-radius: 999px;
-  font-size: clamp(1.5rem, 3.5vw, 2.1rem);
+  font-size: clamp(1.9rem, 4.5vw, 2.85rem);
   line-height: 1;
   display: grid;
   place-items: center;
@@ -883,7 +887,7 @@ body,
 }
 
 .timer-action-btn--reset {
-  font-size: clamp(2.2rem, 5.2vw, 2.9rem);
+  font-size: clamp(2.65rem, 6.2vw, 3.65rem);
 }
 
 .hotspot-layer {
@@ -989,6 +993,15 @@ body,
 .timer-card .ghost-hotspot.timer-action-btn:hover,
 .timer-card .ghost-hotspot.timer-action-btn:focus-visible {
   opacity: var(--ghost-hover-opacity);
+}
+
+/* .ghost-hotspot impose font-size: 0.74rem plus bas : rétablir taille des icônes play/pause et reset */
+.ghost-hotspot.timer-action-btn {
+  font-size: clamp(1.9rem, 4.5vw, 2.85rem);
+}
+
+.ghost-hotspot.timer-action-btn--reset {
+  font-size: clamp(2.65rem, 6.2vw, 3.65rem);
 }
 
 .overlay-hotbar,
