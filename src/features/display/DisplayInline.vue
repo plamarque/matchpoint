@@ -352,25 +352,18 @@ onUnmounted(() => {
               :class="{ 'team-logo-frame--filled': !!match.teamA.logoDataUrl }"
             >
               <template v-if="match.teamA.logoDataUrl">
-                <img
-                  class="team-logo-img"
-                  alt=""
-                  :src="match.teamA.logoDataUrl"
-                />
                 <button
                   type="button"
-                  class="ghost-hotspot team-logo-hit"
-                  aria-label="Changer le logo équipe A"
+                  class="team-logo-change"
+                  aria-label="Changer le logo équipe A — choisir une image"
                   title="Changer le logo"
                   @click="openLogoPicker('A')"
-                />
-                <button
-                  type="button"
-                  class="ghost-hotspot team-logo-clear"
-                  aria-label="Retirer le logo équipe A"
-                  @click.stop="store.setTeamLogo('A', null)"
                 >
-                  ×
+                  <img
+                    class="team-logo-img"
+                    alt=""
+                    :src="match.teamA.logoDataUrl"
+                  />
                 </button>
               </template>
               <button
@@ -770,25 +763,18 @@ onUnmounted(() => {
               :class="{ 'team-logo-frame--filled': !!match.teamB.logoDataUrl }"
             >
               <template v-if="match.teamB.logoDataUrl">
-                <img
-                  class="team-logo-img"
-                  alt=""
-                  :src="match.teamB.logoDataUrl"
-                />
                 <button
                   type="button"
-                  class="ghost-hotspot team-logo-hit"
-                  aria-label="Changer le logo équipe B"
+                  class="team-logo-change"
+                  aria-label="Changer le logo équipe B — choisir une image"
                   title="Changer le logo"
                   @click="openLogoPicker('B')"
-                />
-                <button
-                  type="button"
-                  class="ghost-hotspot team-logo-clear"
-                  aria-label="Retirer le logo équipe B"
-                  @click.stop="store.setTeamLogo('B', null)"
                 >
-                  ×
+                  <img
+                    class="team-logo-img"
+                    alt=""
+                    :src="match.teamB.logoDataUrl"
+                  />
                 </button>
               </template>
               <button

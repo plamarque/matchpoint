@@ -295,7 +295,7 @@ body,
   width: 100%;
   max-width: min(100%, 17.5rem);
   min-height: clamp(6rem, 15vh, 10rem);
-  border-radius: 14px;
+  border-radius: 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -303,70 +303,51 @@ body,
 }
 
 .team-logo-frame--filled {
-  border: 1px solid rgb(255 255 255 / 22%);
-  background: rgb(0 0 0 / 18%);
-  padding: clamp(0.45rem, 1.2vh, 0.7rem);
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
 .team-logo-frame:not(.team-logo-frame--filled) {
-  border: 2px dashed rgb(255 255 255 / 30%);
-  background: rgb(0 0 0 / 12%);
+  border: none;
+  background: transparent;
+}
+
+/* Clic sur le visuel du logo pour ouvrir le sélecteur de fichier */
+.team-logo-change {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.team-logo-change:focus-visible {
+  outline: 2px solid rgb(255 255 255 / 50%);
+  outline-offset: 3px;
+}
+
+.team-logo-change:hover .team-logo-img {
+  opacity: 0.92;
 }
 
 .team-logo-img {
   position: relative;
-  z-index: 1;
+  display: block;
   max-width: 100%;
   max-height: clamp(5.5rem, 14vh, 9.25rem);
   width: auto;
   height: auto;
   object-fit: contain;
   pointer-events: none;
-}
-
-.team-logo-hit {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border: none;
-  border-radius: inherit;
-  background: transparent;
-  cursor: pointer;
-  opacity: var(--ghost-idle-opacity);
-  padding: 0;
-  min-width: 0;
-  min-height: 0;
-}
-
-.team-logo-hit:hover,
-.team-logo-hit:focus-visible {
-  opacity: var(--ghost-hover-opacity);
-}
-
-.team-logo-clear {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  z-index: 3;
-  display: grid;
-  place-items: center;
-  width: 1.65rem;
-  height: 1.65rem;
-  padding: 0;
-  margin: 0;
-  border: 1px solid rgb(255 255 255 / 35%);
-  border-radius: 8px;
-  background: rgb(0 0 0 / 45%);
-  color: #fff;
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-  opacity: var(--ghost-idle-opacity);
-}
-
-.team-logo-clear:hover,
-.team-logo-clear:focus-visible {
-  opacity: var(--ghost-hover-opacity);
+  vertical-align: middle;
 }
 
 /* Zone cliquable pleine ; seul le glyphe est visible (style proche des ghost / overlay) */
@@ -636,7 +617,7 @@ body,
   padding: 0 0.35rem 0.45rem;
 }
 
-/* Même style visuel que la catégorie (accent, sans bordure pilule) */
+/* Comme la catégorie (accent, sans bordure pilule) mais police plus petite */
 .impro-type-inline.impro-type-inline--center-stack {
   margin: 0 auto;
   width: 100%;
@@ -648,7 +629,7 @@ body,
   background: transparent;
   color: var(--accent);
   font-family: var(--font-ui);
-  font-size: clamp(1.6rem, 2.8vw, 2.6rem);
+  font-size: clamp(1.2rem, 2.15vw, 1.95rem);
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1292,9 +1273,12 @@ html.contrast-high {
   }
 
   .category-inline.category-inline--center-stack,
-  .inline-input.category-inline--center-stack,
-  .impro-type-inline.impro-type-inline--center-stack {
+  .inline-input.category-inline--center-stack {
     font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+  }
+
+  .impro-type-inline.impro-type-inline--center-stack {
+    font-size: clamp(1.05rem, 1.75vw, 1.45rem);
   }
 
   .timer-card {
