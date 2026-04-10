@@ -504,7 +504,8 @@ html {
   touch-action: manipulation;
   background: none;
   opacity: var(--ghost-idle-opacity);
-  z-index: 12;
+  /* Au-dessus de .penalties-row (14) : la rangée pleine largeur interceptait les clics sur le triangle */
+  z-index: 16;
   transition: opacity 0.15s;
   /* Zone cliquable plus grande que le triangle visible */
   min-width: 56px;
