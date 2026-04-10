@@ -359,6 +359,24 @@ onUnmounted(() => {
     }"
   >
     <div class="display-inline-scale">
+    <nav
+      class="overlay-hotbar-inline overlay-hotbar-inline--header"
+      aria-label="Annonces"
+    >
+      <button
+        v-for="[overlayKey, overlayLabel] in overlayEntries"
+        :key="overlayKey"
+        type="button"
+        class="ghost-hotspot overlay-icon overlay-icon-btn"
+        :aria-label="overlayLabel"
+        :title="overlayLabel"
+        :data-label="overlayLabel"
+        @click="onOverlayButtonClick(overlayKey)"
+      >
+        <span class="overlay-abbr">{{ overlayIcon(overlayKey) }}</span>
+      </button>
+    </nav>
+
     <header class="display-header inline-header display-header--tiered">
       <InlineEditableText
         aria-label="Titre de l'impro"
@@ -772,19 +790,6 @@ onUnmounted(() => {
           </div>
         </article>
         </div>
-      </div>
-      <div class="overlay-hotbar-inline overlay-hotbar-inline--dock">
-        <button
-          v-for="[overlayKey, overlayLabel] in overlayEntries"
-          :key="overlayKey"
-          class="ghost-hotspot overlay-icon overlay-icon-btn"
-          :aria-label="overlayLabel"
-          :title="overlayLabel"
-          :data-label="overlayLabel"
-          @click="onOverlayButtonClick(overlayKey)"
-        >
-          <span class="overlay-abbr">{{ overlayIcon(overlayKey) }}</span>
-        </button>
       </div>
     </footer>
 

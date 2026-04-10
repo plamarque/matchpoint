@@ -61,7 +61,7 @@ html {
   min-height: 0;
   width: 100%;
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   align-items: stretch;
   transform: scale(var(--display-scale));
   transform-origin: top center;
@@ -1107,7 +1107,7 @@ html {
   pointer-events: none;
 }
 
-/* Barre bas : bloc période centré sur l’écran ; icônes annonces en absolu à gauche */
+/* Barre bas : bloc période centré sur l’écran (icônes annonces déplacées au-dessus du titre) */
 .display-bottom-dock {
   position: fixed;
   bottom: 0;
@@ -1130,17 +1130,20 @@ html {
   pointer-events: auto;
 }
 
-.display-bottom-dock > .overlay-hotbar-inline--dock {
-  pointer-events: auto;
-}
-
-.overlay-hotbar-inline--dock {
-  position: absolute;
-  left: clamp(0.5rem, 2vw, 1.25rem);
-  bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));
-  margin: 0;
-  justify-content: flex-start;
-  z-index: 16;
+.overlay-hotbar-inline--header {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  top: auto;
+  width: 100%;
+  max-width: min(98vw, 1800px);
+  margin: 0 auto clamp(0.45rem, 1.4vh, 0.9rem);
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  z-index: 15;
 }
 
 .display-bottom-dock-main {
@@ -1305,7 +1308,7 @@ html {
 
 .overlay-hotbar-inline .overlay-icon-btn {
   pointer-events: auto;
-  /* Barre d’annonces en bas : rester légèrement visibles sans hover pour viser le bon bouton */
+  /* Icônes annonces : rester légèrement visibles sans hover pour viser le bon bouton */
   opacity: max(var(--ghost-idle-opacity), 0.1);
 }
 
@@ -1316,13 +1319,13 @@ html {
 
 .overlay-icon {
   position: static;
-  width: 3.4rem;
-  height: 3.4rem;
+  width: calc(3.4rem * 1.2);
+  height: calc(3.4rem * 1.2);
   border-radius: 50%;
 }
 
 .overlay-icon span {
-  font-size: 1.45rem;
+  font-size: calc(1.45rem * 1.2);
   opacity: 0.94;
 }
 
@@ -1443,8 +1446,8 @@ html.contrast-high {
   }
 
   .overlay-icon {
-    width: 2.8rem;
-    height: 2.8rem;
+    width: calc(2.8rem * 1.2);
+    height: calc(2.8rem * 1.2);
   }
 }
 
