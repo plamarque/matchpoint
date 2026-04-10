@@ -50,6 +50,7 @@ La V1 fournit un pilotage **100% inline**: toutes les modifications se font dire
 - Le **contenu** de cette zone dépend du **contexte de phase** du match (voir [docs/DOMAIN.md](DOMAIN.md), section *Phases et contenu de la zone chronomètre*).
 - En résumé : **focale improvisation** (temps d’impro pertinent pour le public) → afficher le **temps impro** ; **focale hors improvisation principale** (entracte, vote, temps global de séance, etc.) → afficher le **temps période** dans la **même** zone.
 - Les commandes de réglage et lecture restent disponibles pour les deux logiques de temps selon les règles d’interaction définies en implémentation, sans imposer ici la disposition exacte des contrôles fantômes.
+- Le **chrono période** (réglage, lecture) et la **navigation de période** (← libellé →) sont dans une **barre fixe en bas d’écran** : le **décompte période** et ses contrôles sont **immédiatement au-dessus** du libellé de période ; les **icônes d’annonces** restent sur le **côté gauche** de cette barre. Rien de tout cela n’est affiché dans la colonne entre les panneaux score.
 
 5. **Affichage des scores**
 

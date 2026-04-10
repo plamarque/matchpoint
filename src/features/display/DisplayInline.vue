@@ -133,6 +133,11 @@ const secondaryTimerRunning = computed(() =>
     : match.value.impro.isRunning
 );
 
+/** État « en cours » du chrono période (affiché dans la barre basse). */
+const periodDockRunning = computed(() =>
+  primaryChronoIsImpro.value ? secondaryTimerRunning.value : primaryTimerRunning.value
+);
+
 /** TEMP : opacité idle minimale pour repérer les boutons sans survol — à retirer quand l’UI est figée. */
 const ghostIdleForDebug = computed(() => Math.max(0.34, match.value.ui.ghostIdleOpacity));
 
@@ -441,299 +446,149 @@ onUnmounted(() => {
           </button>
         </div>
 
-        <article class="timer-card timer-card--primary" :class="{ running: primaryTimerRunning }">
-          <template v-if="primaryChronoIsImpro">
-            <div class="impro-clock-layout">
-              <div class="impro-arrow-pair">
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Minutes impro +"
-                  @click="store.nudgeImproMinutes(1)"
-                >
-                  ▲
-                </button>
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Minutes impro -"
-                  @click="store.nudgeImproMinutes(-1)"
-                >
-                  ▼
-                </button>
-              </div>
-
-              <InlineEditableText
-                aria-label="Temps restant impro"
-                class-name="clock inline-editable-clock"
-                :model-value="formatClock(match.impro.timer.remainingSeconds)"
-                placeholder="0:00"
-                @update:model-value="onImproRemainingCommit"
-              />
-
-              <div class="impro-arrow-pair">
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Secondes impro +"
-                  @click="store.nudgeImproSecondsStep(1)"
-                >
-                  ▲
-                </button>
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Secondes impro -"
-                  @click="store.nudgeImproSecondsStep(-1)"
-                >
-                  ▼
-                </button>
-              </div>
-            </div>
-            <div class="timer-controls-row">
+        <article
+          v-if="primaryChronoIsImpro"
+          class="timer-card timer-card--primary"
+          :class="{ running: primaryTimerRunning }"
+        >
+          <div class="impro-clock-layout">
+            <div class="impro-arrow-pair">
               <button
-                class="ghost-hotspot timer-action-btn"
+                class="ghost-hotspot arrow-btn"
                 type="button"
-                aria-label="Play/Pause impro"
-                @click="store.toggleImpro"
+                aria-label="Minutes impro +"
+                @click="store.nudgeImproMinutes(1)"
               >
-                {{ improPlayPauseIcon }}
+                ▲
               </button>
               <button
-                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+                class="ghost-hotspot arrow-btn"
                 type="button"
-                aria-label="Reset impro"
-                @click="store.resetImpro"
+                aria-label="Minutes impro -"
+                @click="store.nudgeImproMinutes(-1)"
               >
-                ↺
+                ▼
               </button>
             </div>
-          </template>
-          <template v-else>
-            <div class="impro-clock-layout">
-              <div class="impro-arrow-pair">
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Minutes période +"
-                  @click="store.nudgePeriodPreset(1)"
-                >
-                  ▲
-                </button>
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Minutes période -"
-                  @click="store.nudgePeriodPreset(-1)"
-                >
-                  ▼
-                </button>
-              </div>
 
-              <InlineEditableText
-                aria-label="Temps restant période"
-                class-name="clock inline-editable-clock"
-                :model-value="formatClock(match.periodTimer.remainingSeconds)"
-                placeholder="0:00"
-                @update:model-value="onPeriodRemainingCommit"
-              />
+            <InlineEditableText
+              aria-label="Temps restant impro"
+              class-name="clock inline-editable-clock"
+              :model-value="formatClock(match.impro.timer.remainingSeconds)"
+              placeholder="0:00"
+              @update:model-value="onImproRemainingCommit"
+            />
 
-              <div class="impro-arrow-pair">
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Secondes période +"
-                  @click="store.nudgePeriodSecondsStep(1)"
-                >
-                  ▲
-                </button>
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Secondes période -"
-                  @click="store.nudgePeriodSecondsStep(-1)"
-                >
-                  ▼
-                </button>
-              </div>
-            </div>
-            <div class="timer-controls-row">
+            <div class="impro-arrow-pair">
               <button
-                class="ghost-hotspot timer-action-btn"
+                class="ghost-hotspot arrow-btn"
                 type="button"
-                aria-label="Play/Pause période"
-                @click="store.togglePeriod"
+                aria-label="Secondes impro +"
+                @click="store.nudgeImproSecondsStep(1)"
               >
-                {{ periodPlayPauseIcon }}
+                ▲
               </button>
               <button
-                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+                class="ghost-hotspot arrow-btn"
                 type="button"
-                aria-label="Reset période"
-                @click="store.resetPeriod"
+                aria-label="Secondes impro -"
+                @click="store.nudgeImproSecondsStep(-1)"
               >
-                ↺
+                ▼
               </button>
             </div>
-          </template>
+          </div>
+          <div class="timer-controls-row">
+            <button
+              class="ghost-hotspot timer-action-btn"
+              type="button"
+              aria-label="Play/Pause impro"
+              @click="store.toggleImpro"
+            >
+              {{ improPlayPauseIcon }}
+            </button>
+            <button
+              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+              type="button"
+              aria-label="Reset impro"
+              @click="store.resetImpro"
+            >
+              ↺
+            </button>
+          </div>
         </article>
 
-        <article class="timer-card timer-card--compact" :class="{ running: secondaryTimerRunning }">
-          <template v-if="primaryChronoIsImpro">
-            <div class="impro-clock-layout">
-              <div class="impro-arrow-pair">
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Minutes période +"
-                  @click="store.nudgePeriodPreset(1)"
-                >
-                  ▲
-                </button>
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Minutes période -"
-                  @click="store.nudgePeriodPreset(-1)"
-                >
-                  ▼
-                </button>
-              </div>
-
-              <InlineEditableText
-                aria-label="Temps restant période"
-                class-name="clock inline-editable-clock"
-                :model-value="formatClock(match.periodTimer.remainingSeconds)"
-                placeholder="0:00"
-                @update:model-value="onPeriodRemainingCommit"
-              />
-
-              <div class="impro-arrow-pair">
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Secondes période +"
-                  @click="store.nudgePeriodSecondsStep(1)"
-                >
-                  ▲
-                </button>
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Secondes période -"
-                  @click="store.nudgePeriodSecondsStep(-1)"
-                >
-                  ▼
-                </button>
-              </div>
-            </div>
-            <div class="timer-controls-row">
+        <article
+          v-if="!primaryChronoIsImpro"
+          class="timer-card timer-card--compact"
+          :class="{ running: secondaryTimerRunning }"
+        >
+          <div class="impro-clock-layout">
+            <div class="impro-arrow-pair">
               <button
-                class="ghost-hotspot timer-action-btn"
+                class="ghost-hotspot arrow-btn"
                 type="button"
-                aria-label="Play/Pause période"
-                @click="store.togglePeriod"
+                aria-label="Minutes impro +"
+                @click="store.nudgeImproMinutes(1)"
               >
-                {{ periodPlayPauseIcon }}
+                ▲
               </button>
               <button
-                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+                class="ghost-hotspot arrow-btn"
                 type="button"
-                aria-label="Reset période"
-                @click="store.resetPeriod"
+                aria-label="Minutes impro -"
+                @click="store.nudgeImproMinutes(-1)"
               >
-                ↺
+                ▼
               </button>
             </div>
-          </template>
-          <template v-else>
-            <div class="impro-clock-layout">
-              <div class="impro-arrow-pair">
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Minutes impro +"
-                  @click="store.nudgeImproMinutes(1)"
-                >
-                  ▲
-                </button>
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Minutes impro -"
-                  @click="store.nudgeImproMinutes(-1)"
-                >
-                  ▼
-                </button>
-              </div>
 
-              <InlineEditableText
-                aria-label="Temps restant impro"
-                class-name="clock inline-editable-clock"
-                :model-value="formatClock(match.impro.timer.remainingSeconds)"
-                placeholder="0:00"
-                @update:model-value="onImproRemainingCommit"
-              />
+            <InlineEditableText
+              aria-label="Temps restant impro"
+              class-name="clock inline-editable-clock"
+              :model-value="formatClock(match.impro.timer.remainingSeconds)"
+              placeholder="0:00"
+              @update:model-value="onImproRemainingCommit"
+            />
 
-              <div class="impro-arrow-pair">
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Secondes impro +"
-                  @click="store.nudgeImproSecondsStep(1)"
-                >
-                  ▲
-                </button>
-                <button
-                  class="ghost-hotspot arrow-btn"
-                  type="button"
-                  aria-label="Secondes impro -"
-                  @click="store.nudgeImproSecondsStep(-1)"
-                >
-                  ▼
-                </button>
-              </div>
-            </div>
-            <div class="timer-controls-row">
+            <div class="impro-arrow-pair">
               <button
-                class="ghost-hotspot timer-action-btn"
+                class="ghost-hotspot arrow-btn"
                 type="button"
-                aria-label="Play/Pause impro"
-                @click="store.toggleImpro"
+                aria-label="Secondes impro +"
+                @click="store.nudgeImproSecondsStep(1)"
               >
-                {{ improPlayPauseIcon }}
+                ▲
               </button>
               <button
-                class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+                class="ghost-hotspot arrow-btn"
                 type="button"
-                aria-label="Reset impro"
-                @click="store.resetImpro"
+                aria-label="Secondes impro -"
+                @click="store.nudgeImproSecondsStep(-1)"
               >
-                ↺
+                ▼
               </button>
             </div>
-          </template>
+          </div>
+          <div class="timer-controls-row">
+            <button
+              class="ghost-hotspot timer-action-btn"
+              type="button"
+              aria-label="Play/Pause impro"
+              @click="store.toggleImpro"
+            >
+              {{ improPlayPauseIcon }}
+            </button>
+            <button
+              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+              type="button"
+              aria-label="Reset impro"
+              @click="store.resetImpro"
+            >
+              ↺
+            </button>
+          </div>
         </article>
-
-        <div class="period-row">
-          <button
-            type="button"
-            class="period-nav-btn"
-            aria-label="Période précédente"
-            @click="store.previousPeriod()"
-          >
-            ←
-          </button>
-          <p class="period-label">{{ displayPeriodLabel }}</p>
-          <button
-            type="button"
-            class="period-nav-btn"
-            aria-label="Période suivante"
-            @click="store.nextPeriod()"
-          >
-            →
-          </button>
-        </div>
       </section>
 
       <article
@@ -830,19 +685,118 @@ onUnmounted(() => {
       </article>
     </section>
 
-    <div class="overlay-hotbar-inline">
-      <button
-        v-for="[overlayKey, overlayLabel] in overlayEntries"
-        :key="overlayKey"
-        class="ghost-hotspot overlay-icon overlay-icon-btn"
-        :aria-label="overlayLabel"
-        :title="overlayLabel"
-        :data-label="overlayLabel"
-        @click="onOverlayButtonClick(overlayKey)"
-      >
-        <span class="overlay-abbr">{{ overlayIcon(overlayKey) }}</span>
-      </button>
-    </div>
+    <footer class="display-bottom-dock" aria-label="Annonces et période">
+      <div class="display-bottom-dock-center-wrap">
+        <div class="display-bottom-dock-main">
+        <article
+          class="timer-card timer-card--dock timer-card--dock-period"
+          :class="{
+            running: periodDockRunning,
+            'timer-card--dock-period--focal': !primaryChronoIsImpro
+          }"
+        >
+          <div class="impro-clock-layout impro-clock-layout--dock">
+            <div class="impro-arrow-pair">
+              <button
+                class="ghost-hotspot arrow-btn"
+                type="button"
+                aria-label="Minutes période +"
+                @click="store.nudgePeriodPreset(1)"
+              >
+                ▲
+              </button>
+              <button
+                class="ghost-hotspot arrow-btn"
+                type="button"
+                aria-label="Minutes période -"
+                @click="store.nudgePeriodPreset(-1)"
+              >
+                ▼
+              </button>
+            </div>
+
+            <InlineEditableText
+              aria-label="Temps restant période"
+              class-name="clock inline-editable-clock"
+              :model-value="formatClock(match.periodTimer.remainingSeconds)"
+              placeholder="0:00"
+              @update:model-value="onPeriodRemainingCommit"
+            />
+
+            <div class="impro-arrow-pair">
+              <button
+                class="ghost-hotspot arrow-btn"
+                type="button"
+                aria-label="Secondes période +"
+                @click="store.nudgePeriodSecondsStep(1)"
+              >
+                ▲
+              </button>
+              <button
+                class="ghost-hotspot arrow-btn"
+                type="button"
+                aria-label="Secondes période -"
+                @click="store.nudgePeriodSecondsStep(-1)"
+              >
+                ▼
+              </button>
+            </div>
+          </div>
+          <div class="timer-controls-row timer-controls-row--dock">
+            <button
+              class="ghost-hotspot timer-action-btn"
+              type="button"
+              aria-label="Play/Pause période"
+              @click="store.togglePeriod"
+            >
+              {{ periodPlayPauseIcon }}
+            </button>
+            <button
+              class="ghost-hotspot timer-action-btn timer-action-btn--reset"
+              type="button"
+              aria-label="Reset période"
+              @click="store.resetPeriod"
+            >
+              ↺
+            </button>
+          </div>
+        </article>
+
+        <div class="period-row period-row--dock">
+          <button
+            type="button"
+            class="period-nav-btn"
+            aria-label="Période précédente"
+            @click="store.previousPeriod()"
+          >
+            ←
+          </button>
+          <p class="period-label">{{ displayPeriodLabel }}</p>
+          <button
+            type="button"
+            class="period-nav-btn"
+            aria-label="Période suivante"
+            @click="store.nextPeriod()"
+          >
+            →
+          </button>
+        </div>
+        </div>
+      </div>
+      <div class="overlay-hotbar-inline overlay-hotbar-inline--dock">
+        <button
+          v-for="[overlayKey, overlayLabel] in overlayEntries"
+          :key="overlayKey"
+          class="ghost-hotspot overlay-icon overlay-icon-btn"
+          :aria-label="overlayLabel"
+          :title="overlayLabel"
+          :data-label="overlayLabel"
+          @click="onOverlayButtonClick(overlayKey)"
+        >
+          <span class="overlay-abbr">{{ overlayIcon(overlayKey) }}</span>
+        </button>
+      </div>
+    </footer>
 
     <HotspotLayer
       :hotspots="hotspots"

@@ -29,7 +29,8 @@ body,
 
 .display-inline {
   min-height: 100vh;
-  padding: clamp(1.1rem, 2.6vh, 2rem) clamp(1rem, 2.2vw, 2rem) clamp(1.3rem, 2.8vh, 2.2rem);
+  padding: clamp(1.1rem, 2.6vh, 2rem) clamp(1rem, 2.2vw, 2rem)
+    calc(clamp(1.3rem, 2.8vh, 2.2rem) + clamp(6rem, 15vh, 9.5rem));
   transform: scale(var(--display-scale));
   transform-origin: top left;
   position: relative;
@@ -233,7 +234,7 @@ body,
   background: linear-gradient(145deg, color-mix(in srgb, var(--team-color) 72%, black), color-mix(in srgb, var(--team-color) 45%, #12263a));
   border-radius: var(--radius);
   box-shadow: 0 16px 48px rgb(0 0 0 / 32%);
-  padding: clamp(0.9rem, 1.8vh, 1.35rem);
+  padding: clamp(0.75rem, 1.5vh, 1.1rem);
   display: grid;
   grid-template-rows: auto 1fr auto;
   align-content: start;
@@ -242,7 +243,7 @@ body,
   text-align: center;
   aspect-ratio: 1 / 1;
   align-self: center;
-  max-height: min(80vh, 100%);
+  max-height: min(58vh, 100%);
 }
 
 .team-card--scoreboard {
@@ -294,7 +295,7 @@ body,
   position: relative;
   width: 100%;
   max-width: min(100%, 17.5rem);
-  min-height: clamp(6rem, 15vh, 10rem);
+  min-height: clamp(5rem, 12vh, 8.5rem);
   border-radius: 0;
   box-sizing: border-box;
   display: flex;
@@ -537,11 +538,9 @@ body,
 .center-stack {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: clamp(0.4rem, 1vh, 0.8rem);
-  align-self: start;
-  /* Hauteur = même que les cartes (colonne 1fr vs 0.75fr → hauteur carte = largeur centre × 4/3) */
-  aspect-ratio: 3 / 4;
+  align-self: stretch;
   width: 100%;
   min-height: 0;
 }
@@ -595,11 +594,6 @@ body,
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.center-stack .period-row {
-  flex: 0 0 auto;
-  margin-top: clamp(0.35rem, 1vh, 0.65rem);
 }
 
 .center-stack-category {
@@ -861,7 +855,7 @@ body,
   gap: 0.65rem;
 }
 
-/* Superposer play/pause et reset sur les chiffres (invisibles sauf au hover) pour gagner de la place */
+/* Play/pause et reset sous chaque cadran chrono (pas mélangés à la navigation période) */
 .timer-card .timer-controls-row {
   position: absolute;
   bottom: 0.25rem;
@@ -980,7 +974,7 @@ body,
   opacity: 1;
 }
 
-/* Boutons play/pause et reset dans les cartes timer : rester dans le flux et bien visibles */
+/* Boutons play/pause et reset dans les cartes timer : flux normal (sous les chiffres en absolute row) */
 .timer-card .ghost-hotspot.timer-action-btn,
 .timer-card .ghost-hotspot.arrow-btn {
   position: static;
@@ -1025,6 +1019,134 @@ body,
   margin-bottom: 0.2rem;
   z-index: 15;
   pointer-events: none;
+}
+
+/* Barre bas : bloc période centré sur l’écran ; icônes annonces en absolu à gauche */
+.display-bottom-dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 15;
+  padding: 0.25rem 0 calc(0.4rem + env(safe-area-inset-bottom, 0px));
+  pointer-events: none;
+  background: transparent;
+}
+
+.display-bottom-dock-center-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  pointer-events: none;
+}
+
+.display-bottom-dock-center-wrap .display-bottom-dock-main {
+  pointer-events: auto;
+}
+
+.display-bottom-dock > .overlay-hotbar-inline--dock {
+  pointer-events: auto;
+}
+
+.overlay-hotbar-inline--dock {
+  position: absolute;
+  left: clamp(0.5rem, 2vw, 1.25rem);
+  bottom: calc(0.35rem + env(safe-area-inset-bottom, 0px));
+  margin: 0;
+  justify-content: flex-start;
+  z-index: 16;
+}
+
+.display-bottom-dock-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  width: 100%;
+  max-width: min(92vw, 36rem);
+  margin: 0 auto;
+  padding: 0 0.5rem;
+}
+
+/* Chrono période : fond transparent (pas de carte bleue) */
+.timer-card.timer-card--dock {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0;
+  width: 100%;
+  max-width: min(100%, 30rem);
+  margin: 0 auto;
+  padding: 0;
+}
+
+.timer-card--dock.running {
+  box-shadow: none !important;
+}
+
+.timer-card--dock.running .clock {
+  text-shadow:
+    0 0 20px color-mix(in srgb, var(--success) 40%, transparent),
+    0 1px 8px rgb(0 0 0 / 35%);
+}
+
+.timer-card--dock .impro-clock-layout--dock {
+  margin-top: 0;
+}
+
+.impro-clock-layout--dock {
+  gap: clamp(0.35rem, 1.2vw, 0.75rem);
+}
+
+.timer-card--dock .timer-controls-row--dock {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  right: auto;
+  margin-top: 0.15rem;
+}
+
+.timer-card--dock .ghost-hotspot.timer-action-btn,
+.timer-card--dock .ghost-hotspot.arrow-btn {
+  position: static;
+}
+
+.timer-card--dock .ghost-hotspot.timer-action-btn {
+  width: clamp(2.5rem, 5.5vw, 3.85rem);
+  height: clamp(2.5rem, 5.5vw, 3.85rem);
+  font-size: clamp(1.45rem, 3.5vw, 2.2rem);
+}
+
+.timer-card--dock .ghost-hotspot.timer-action-btn--reset {
+  font-size: clamp(2rem, 4.5vw, 2.85rem);
+}
+
+.timer-card--dock-period .clock {
+  font-size: clamp(1.4rem, 3.8vw, 2.45rem);
+  margin: 0.05rem 0 0;
+}
+
+.timer-card--dock-period--focal .clock {
+  font-size: clamp(2rem, 5.5vw, 3.75rem);
+}
+
+.timer-card--dock-period .arrow-btn {
+  width: clamp(1.65rem, 2.9vw, 2.5rem);
+  height: clamp(1.4rem, 2.5vw, 2.1rem);
+  font-size: clamp(0.8rem, 1.4vw, 1.15rem);
+}
+
+.timer-card--dock-period--focal .arrow-btn {
+  width: clamp(2.1rem, 3.6vw, 3rem);
+  height: clamp(1.75rem, 3vw, 2.5rem);
+  font-size: clamp(1rem, 1.8vw, 1.45rem);
+}
+
+.period-row--dock {
+  margin-top: 0;
+  min-height: auto;
+  gap: clamp(0.5rem, 1.5vw, 1rem);
 }
 
 .overlay-hotbar-inline .overlay-icon-btn {
@@ -1199,7 +1321,7 @@ html.contrast-high {
 /* Hauteur limitée (ex. iPad 768px) : tout tient dans l’écran, espace vertical équilibré */
 @media (min-width: 1024px) and (max-height: 800px) {
   .display-inline {
-    padding: 4rem 1rem 0.8rem;
+    padding: 4rem 1rem calc(0.8rem + clamp(5.5rem, 13vh, 8rem));
     min-height: 100vh;
     min-height: 100dvh;
     align-items: start;
@@ -1235,6 +1357,7 @@ html.contrast-high {
 
   .team-card {
     padding: 0.6rem 0.5rem;
+    max-height: min(52vh, 100%);
   }
 
   .team-name {
@@ -1242,7 +1365,7 @@ html.contrast-high {
   }
 
   .team-logo-frame {
-    min-height: clamp(5rem, 12.5vh, 8rem);
+    min-height: clamp(4.25rem, 10vh, 6.75rem);
     max-width: min(100%, 15rem);
   }
 
