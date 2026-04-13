@@ -11,6 +11,7 @@ import { useRemoteChannel } from "@/remote/useRemoteChannel";
 import { isPrimaryChronoImpro } from "@/services/displayTimer";
 import { useMatchStore } from "@/stores/matchStore";
 import type { HotspotDefinition, OverlayKey, TeamKey } from "@/types/match";
+import { isLogoImageFile } from "@/utils/logoImageFile";
 import { useKeyboardShortcuts } from "@/utils/useKeyboardShortcuts";
 
 const remoteBackendUrl = (import.meta.env as { VITE_REMOTE_BACKEND_WS_URL?: string }).VITE_REMOTE_BACKEND_WS_URL ?? "";
@@ -286,7 +287,7 @@ function onTeamLogoFile(team: TeamKey, event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   input.value = "";
-  if (!file || !file.type.startsWith("image/")) {
+  if (!file || !isLogoImageFile(file)) {
     return;
   }
   const reader = new FileReader();
@@ -294,6 +295,29 @@ function onTeamLogoFile(team: TeamKey, event: Event) {
     const data = reader.result;
     if (typeof data === "string") {
       store.setTeamLogo(team, data);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+const logoInputOrganizer = ref<HTMLInputElement | null>(null);
+
+function openOrganizerLogoPicker() {
+  logoInputOrganizer.value?.click();
+}
+
+function onOrganizerLogoFile(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = "";
+  if (!file || !isLogoImageFile(file)) {
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const data = reader.result;
+    if (typeof data === "string") {
+      store.setOrganizerLogo(data);
     }
   };
   reader.readAsDataURL(file);
@@ -495,87 +519,93 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <article
-            class="timer-card"
-            :class="[
-              primaryChronoIsImpro ? 'timer-card--primary' : 'timer-card--compact',
-              {
-                running: primaryChronoIsImpro ? primaryTimerRunning : secondaryTimerRunning
-              }
-            ]"
-          >
-            <div class="dock-period-clock-row">
-              <div class="dock-period-unit">
+          <div class="center-stack-timer-zone">
+            <article
+              class="timer-card"
+              :class="[
+                primaryChronoIsImpro ? 'timer-card--primary' : 'timer-card--compact',
+                {
+                  running: primaryChronoIsImpro ? primaryTimerRunning : secondaryTimerRunning
+                }
+              ]"
+            >
+              <div
+                class="impro-clock-grid"
+                role="group"
+                aria-label="Chrono improvisation"
+              >
                 <button
-                  class="ghost-hotspot arrow-btn dock-period-arrow"
                   type="button"
+                  class="ghost-hotspot arrow-btn dock-period-arrow impro-clock-btn impro-clock-btn--arrow impro-clock-grid__ctrl-col impro-clock-grid__ctrl-col--mm"
                   aria-label="Minutes impro +"
                   @click="store.nudgeImproMinutes(1)"
                 >
                   ▲
                 </button>
-                <InlineEditableText
-                  aria-label="Minutes impro"
-                  class-name="clock inline-editable-clock dock-period-mm"
-                  :model-value="improMinutesPadded"
-                  placeholder="00"
-                  @update:model-value="onImproMinutesCommit"
-                />
                 <button
-                  class="ghost-hotspot arrow-btn dock-period-arrow"
                   type="button"
-                  aria-label="Minutes impro -"
-                  @click="store.nudgeImproMinutes(-1)"
-                >
-                  ▼
-                </button>
-              </div>
-              <span class="dock-period-colon" aria-hidden="true">:</span>
-              <div class="dock-period-unit">
-                <button
-                  class="ghost-hotspot arrow-btn dock-period-arrow"
-                  type="button"
-                  aria-label="Secondes impro +"
-                  @click="store.nudgeImproSecondsStep(1)"
-                >
-                  ▲
-                </button>
-                <InlineEditableText
-                  aria-label="Secondes impro"
-                  class-name="clock inline-editable-clock dock-period-ss"
-                  :model-value="improSecondsPadded"
-                  placeholder="00"
-                  @update:model-value="onImproSecondsCommit"
-                />
-                <button
-                  class="ghost-hotspot arrow-btn dock-period-arrow"
-                  type="button"
-                  aria-label="Secondes impro -"
-                  @click="store.nudgeImproSecondsStep(-1)"
-                >
-                  ▼
-                </button>
-              </div>
-              <div class="dock-period-side-actions">
-                <button
-                  class="ghost-hotspot timer-action-btn"
-                  type="button"
+                  class="ghost-hotspot timer-action-btn impro-clock-btn impro-clock-btn--play"
                   aria-label="Play/Pause impro"
                   @click="store.toggleImpro"
                 >
                   {{ improPlayPauseIcon }}
                 </button>
                 <button
-                  class="ghost-hotspot timer-action-btn timer-action-btn--reset"
                   type="button"
+                  class="ghost-hotspot arrow-btn dock-period-arrow impro-clock-btn impro-clock-btn--arrow impro-clock-grid__ctrl-col impro-clock-grid__ctrl-col--ss"
+                  aria-label="Secondes impro +"
+                  @click="store.nudgeImproSecondsStep(1)"
+                >
+                  ▲
+                </button>
+
+                <div class="impro-clock-grid__cell impro-clock-grid__cell--mm">
+                  <InlineEditableText
+                    aria-label="Minutes impro"
+                    class-name="clock inline-editable-clock dock-period-mm"
+                    :model-value="improMinutesPadded"
+                    placeholder="00"
+                    @update:model-value="onImproMinutesCommit"
+                  />
+                </div>
+                <span class="dock-period-colon impro-clock-sep" aria-hidden="true">:</span>
+                <div class="impro-clock-grid__cell impro-clock-grid__cell--ss">
+                  <InlineEditableText
+                    aria-label="Secondes impro"
+                    class-name="clock inline-editable-clock dock-period-ss"
+                    :model-value="improSecondsPadded"
+                    placeholder="00"
+                    @update:model-value="onImproSecondsCommit"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  class="ghost-hotspot arrow-btn dock-period-arrow impro-clock-btn impro-clock-btn--arrow impro-clock-grid__ctrl-col impro-clock-grid__ctrl-col--mm"
+                  aria-label="Minutes impro -"
+                  @click="store.nudgeImproMinutes(-1)"
+                >
+                  ▼
+                </button>
+                <button
+                  type="button"
+                  class="ghost-hotspot timer-action-btn timer-action-btn--reset impro-clock-btn impro-clock-btn--reset"
                   aria-label="Reset impro"
                   @click="store.resetImpro"
                 >
                   ↺
                 </button>
+                <button
+                  type="button"
+                  class="ghost-hotspot arrow-btn dock-period-arrow impro-clock-btn impro-clock-btn--arrow impro-clock-grid__ctrl-col impro-clock-grid__ctrl-col--ss"
+                  aria-label="Secondes impro -"
+                  @click="store.nudgeImproSecondsStep(-1)"
+                >
+                  ▼
+                </button>
               </div>
-            </div>
-          </article>
+            </article>
+          </div>
 
           <div class="center-stack-impro-type">
             <button
@@ -808,6 +838,51 @@ onUnmounted(() => {
       :hover-opacity="match.ui.ghostHoverOpacity"
       :hotspot-scale="match.ui.hotspotScale"
     />
+
+    <div
+      class="organizer-logo-layer"
+      :style="{
+        '--ghost-idle-opacity': String(match.ui.ghostIdleOpacity),
+        '--ghost-hover-opacity': String(match.ui.ghostHoverOpacity),
+        '--hotspot-scale': String(match.ui.hotspotScale)
+      }"
+    >
+      <input
+        ref="logoInputOrganizer"
+        type="file"
+        class="team-logo-input"
+        accept="image/*"
+        tabindex="-1"
+        aria-hidden="true"
+        @change="onOrganizerLogoFile"
+      />
+      <div
+        class="organizer-logo-frame"
+        :class="{ 'organizer-logo-frame--filled': !!match.organizerLogoDataUrl }"
+      >
+        <template v-if="match.organizerLogoDataUrl">
+          <button
+            type="button"
+            class="team-logo-change"
+            aria-label="Changer le logo organisateur — choisir une image"
+            title="Changer le logo"
+            @click="openOrganizerLogoPicker"
+          >
+            <img class="team-logo-img organizer-logo-img" alt="" :src="match.organizerLogoDataUrl" />
+          </button>
+        </template>
+        <button
+          v-else
+          type="button"
+          class="team-logo-placeholder"
+          aria-label="Ajouter un logo organisateur — choisir une image"
+          title="Choisir une image"
+          @click="openOrganizerLogoPicker"
+        >
+          <span class="team-logo-glyph" aria-hidden="true">＋</span>
+        </button>
+      </div>
+    </div>
 
     <OverlayPanel
       :overlay="match.overlay.activeOverlay"

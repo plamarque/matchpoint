@@ -37,6 +37,7 @@ export function buildSnapshot(store: {
     },
     overlay: { ...m.overlay },
     status: m.status,
+    organizerLogoDataUrl: m.organizerLogoDataUrl,
     showRemoteQrModal: qr
   };
 }

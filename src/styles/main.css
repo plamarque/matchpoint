@@ -447,6 +447,98 @@ html {
   transform: scale(1.02);
 }
 
+/* Logo organisateur : ancrage bas-gauche, proportions conservées, bornes pour ne pas empiéter sur le triangle couleur (haut) ni sur le dock période (centre). */
+.organizer-logo-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  /* Aligné sur .display-bottom-dock-main : max-width min(96vw, 52rem) centré — gouttière gauche disponible */
+  --organizer-max-w: min(
+    11rem,
+    28vw,
+    max(2.25rem, max(0px, calc((100vw - min(96vw, 52rem)) / 2 - 0.5rem)))
+  );
+  /* Hauteur max : reste sous la carte équipe / triangle couleur, au-dessus du dock */
+  --organizer-max-h: min(16vh, 9.5rem, 26vmin);
+}
+
+/* Marges comme les boutons d’angle : HotspotLayer plein écran x:1% ; QR bas-droite top 91% + h 7% → ~2% du bas */
+.organizer-logo-layer .organizer-logo-frame {
+  position: absolute;
+  left: max(1%, env(safe-area-inset-left, 0px));
+  bottom: max(2%, env(safe-area-inset-bottom, 0px));
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  width: auto;
+  height: auto;
+  max-width: var(--organizer-max-w);
+  max-height: var(--organizer-max-h);
+  pointer-events: auto;
+}
+
+.organizer-logo-frame--filled {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+/* Spécificité > .organizer-logo-layer .organizer-logo-frame pour imposer la fente (SVG sans dimensions intrinsèques). */
+.organizer-logo-layer .organizer-logo-frame.organizer-logo-frame--filled {
+  width: var(--organizer-max-w);
+  height: var(--organizer-max-h);
+  max-width: var(--organizer-max-w);
+  max-height: var(--organizer-max-h);
+}
+
+.organizer-logo-frame:not(.organizer-logo-frame--filled) {
+  border: none;
+  background: transparent;
+  width: min(3.75rem, 11vw);
+  height: min(3.75rem, 11vw);
+  max-width: var(--organizer-max-w);
+  max-height: var(--organizer-max-h);
+  flex-shrink: 0;
+}
+
+.organizer-logo-layer .organizer-logo-frame--filled .team-logo-change {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  align-self: stretch;
+  line-height: 0;
+}
+
+.organizer-logo-layer .organizer-logo-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: left bottom;
+  pointer-events: none;
+}
+
+.organizer-logo-layer .organizer-logo-frame:not(.organizer-logo-frame--filled) .team-logo-placeholder {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.organizer-logo-layer .team-logo-glyph {
+  width: clamp(1.35rem, 3vw, 2rem);
+  height: clamp(1.35rem, 3vw, 2rem);
+  font-size: clamp(0.85rem, 1.75vw, 1.15rem);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -599,6 +691,9 @@ html {
 }
 
 .center-stack {
+  /* Permet d’adapter padding et typo du chrono à la largeur réelle de la colonne (évite le débordement sur les cartes) */
+  container-type: inline-size;
+  container-name: center-stack;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -654,81 +749,135 @@ html {
 
 .center-stack .timer-card--compact .dock-period-mm.clock,
 .center-stack .timer-card--compact .dock-period-ss.clock {
-  font-size: clamp(2.25rem, 6vw, 4.1rem);
+  font-size: clamp(2.75rem, min(8.5vw, 19cqi), 5.5rem);
   margin: 0;
   min-width: 2.6ch;
   text-align: center;
 }
 
 .center-stack .timer-card--compact .dock-period-colon {
-  font-size: clamp(2.25rem, 6vw, 4.1rem);
+  font-size: clamp(2.75rem, min(8.5vw, 19cqi), 5.5rem);
 }
 
-.center-stack .timer-card--compact .dock-period-arrow {
-  width: clamp(2.35rem, 4vw, 3.35rem);
-  height: clamp(1.95rem, 3.3vw, 2.75rem);
-  font-size: clamp(1.1rem, 2vw, 1.6rem);
+.center-stack .timer-card--compact .impro-clock-grid .dock-period-arrow {
+  width: clamp(2.95rem, 5.2vw, 4.15rem);
+  height: clamp(2.45rem, 4.4vw, 3.45rem);
+  font-size: clamp(1.4rem, 2.5vw, 2.05rem);
 }
 
-.center-stack .timer-card--compact .timer-action-btn {
-  width: clamp(2.5rem, 5vw, 3.35rem);
-  height: clamp(2.5rem, 5vw, 3.35rem);
-  font-size: clamp(1.35rem, 3.2vw, 2rem);
+.center-stack .timer-card--compact .impro-clock-grid .impro-clock-btn--play,
+.center-stack .timer-card--compact .impro-clock-grid .impro-clock-btn--reset {
+  width: clamp(2.75rem, min(5.8vw, 7.85cqi), 3.95rem);
+  height: clamp(2.45rem, min(5.1vw, 7cqi), 3.55rem);
 }
 
-.center-stack .timer-card--compact .timer-action-btn--reset {
-  font-size: clamp(1.85rem, 4vw, 2.65rem);
+.center-stack .timer-card--compact .impro-clock-grid .impro-clock-btn--play {
+  font-size: clamp(1.5rem, min(3.1vw, 3.95cqi), 2.2rem);
 }
 
-/* Ligne chrono impro : padding symétrique + actions hors flux pour aligner les chiffres sur la catégorie / le type */
-.center-stack .dock-period-clock-row {
-  position: relative;
+.center-stack .timer-card--compact .impro-clock-grid .impro-clock-btn--reset {
+  font-size: clamp(1.85rem, min(3.75vw, 4.65cqi), 2.85rem);
+}
+
+/* Même marges que .center-stack-category (ext.) + .category-inline--center-stack (int.) */
+.center-stack-timer-zone {
+  width: 100%;
   box-sizing: border-box;
-  padding-left: clamp(2.5rem, 8.5vw, 5.5rem);
-  padding-right: clamp(2.5rem, 8.5vw, 5.5rem);
+  padding: 0.1rem 0.35rem;
 }
 
-.center-stack .dock-period-side-actions {
-  position: absolute;
-  top: 50%;
-  right: clamp(0.1rem, 0.5vw, 0.45rem);
-  z-index: 2;
-  margin-left: 0;
-  transform: translateY(-50%);
+/* Grille 3×3 : colonnes au plus juste (max-content) pour coller mm | : | ss ; centrage du bloc entier */
+.center-stack .impro-clock-grid {
+  display: grid;
+  grid-template-columns: max-content max-content max-content;
+  grid-template-rows: auto auto auto;
+  align-items: center;
+  justify-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.2rem 0.5rem;
+  column-gap: clamp(0, min(0.2vw, 0.25cqi), 0.1rem);
+  row-gap: clamp(0.12rem, min(0.55vw, 0.9cqi), 0.45rem);
 }
 
-.center-stack .timer-card--primary .dock-period-clock-row {
+.center-stack .impro-clock-grid__ctrl-col--mm {
+  justify-self: end;
+}
+
+.center-stack .impro-clock-grid__ctrl-col--ss {
+  justify-self: start;
+}
+
+.center-stack .impro-clock-grid__cell {
+  min-width: 0;
+  width: auto;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
-.center-stack .timer-card--compact .dock-period-clock-row {
+.center-stack .impro-clock-grid__cell--mm {
+  justify-self: end;
+  justify-content: flex-end;
+}
+
+.center-stack .impro-clock-grid__cell--ss {
+  justify-self: start;
+  justify-content: flex-start;
+}
+
+/* Resserre l’espace visuel autour du « : » (proportions au corps du chrono) */
+.center-stack .impro-clock-sep.dock-period-colon {
+  margin-inline: -0.04em;
+  padding-inline: 0;
+}
+
+.center-stack .impro-clock-grid__cell .inline-editable {
+  max-width: 100%;
+}
+
+.center-stack .timer-card--compact .impro-clock-grid {
   flex: 0 1 auto;
   min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .center-stack .timer-card--primary .dock-period-mm.clock,
 .center-stack .timer-card--primary .dock-period-ss.clock {
-  font-size: clamp(3.35rem, 9.5vw, 7.35rem);
+  font-size: clamp(3.25rem, 18vw, 12rem);
+  font-size: clamp(3.25rem, min(18vw, 34cqi), 14rem);
   margin: 0;
   min-width: 2.6ch;
+  max-width: 100%;
   text-align: center;
 }
 
 .center-stack .timer-card--primary .dock-period-colon {
-  font-size: clamp(3.35rem, 9.5vw, 7.35rem);
+  font-size: clamp(3.25rem, 18vw, 12rem);
+  font-size: clamp(3.25rem, min(18vw, 34cqi), 14rem);
   line-height: 1;
   align-self: center;
 }
 
-.center-stack .timer-card--primary .dock-period-arrow {
-  width: clamp(2.9rem, 4.5vw, 4.4rem);
-  height: clamp(2.45rem, 4vw, 3.6rem);
-  font-size: clamp(1.35rem, 2.5vw, 2.15rem);
+.center-stack .timer-card--primary .impro-clock-grid .impro-clock-btn--play,
+.center-stack .timer-card--primary .impro-clock-grid .impro-clock-btn--reset {
+  width: clamp(3.55rem, min(8vw, 11.5cqi), 6rem);
+  height: clamp(3.2rem, min(7.2vw, 10.5cqi), 5.35rem);
+}
+
+.center-stack .timer-card--primary .impro-clock-grid .impro-clock-btn--play {
+  font-size: clamp(1.95rem, min(4.5vw, 5.5cqi), 3.15rem);
+}
+
+.center-stack .timer-card--primary .impro-clock-grid .impro-clock-btn--reset {
+  font-size: clamp(2.35rem, min(5.4vw, 6.5cqi), 3.85rem);
+}
+
+.center-stack .timer-card--primary .impro-clock-grid .arrow-btn {
+  width: clamp(3.15rem, min(6.6vw, 8.5cqi), 5.65rem);
+  height: clamp(2.75rem, min(5.8vw, 7.25cqi), 4.65rem);
+  font-size: clamp(1.6rem, min(3.2vw, 3.85cqi), 2.65rem);
 }
 
 .center-stack-category {
@@ -1643,7 +1792,8 @@ html.contrast-high {
     height: clamp(1.75rem, 2.8vw, 2.6rem);
   }
 
-  .center-stack .dock-period-clock-row {
-    gap: 0.35rem clamp(0.35rem, 1vw, 0.55rem);
+  .center-stack .impro-clock-grid {
+    column-gap: clamp(0, 0.25vw, 0.08rem);
+    row-gap: clamp(0.1rem, 0.85vw, 0.35rem);
   }
 }

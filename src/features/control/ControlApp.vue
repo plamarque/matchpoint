@@ -6,6 +6,7 @@ import type { RemoteStateSnapshot } from "@/types/match";
 import { getNextTeamColor, OVERLAY_LABELS, PERIOD_LABELS, TEAM_PALETTES } from "@/constants/match";
 import type { OverlayKey } from "@/types/match";
 import type { TeamKey } from "@/types/match";
+import { isLogoImageFile } from "@/utils/logoImageFile";
 
 const backendWsUrl = (import.meta.env as { VITE_REMOTE_BACKEND_WS_URL?: string }).VITE_REMOTE_BACKEND_WS_URL ?? "";
 const code = ref("");
@@ -30,9 +31,11 @@ const teamColorA = ref(TEAM_PALETTES.classic[0]);
 const teamColorB = ref(TEAM_PALETTES.classic[1]);
 const teamLogoA = ref<string | null>(null);
 const teamLogoB = ref<string | null>(null);
+const organizerLogo = ref<string | null>(null);
 
 const logoInputA = ref<HTMLInputElement | null>(null);
 const logoInputB = ref<HTMLInputElement | null>(null);
+const logoInputOrganizer = ref<HTMLInputElement | null>(null);
 
 /** Type d’impro (suivi local). */
 const improType = ref<"mixte" | "comparee" | "none">("mixte");
@@ -303,6 +306,10 @@ function applyState(payload: RemoteStateSnapshot) {
   const lb = tB?.logoDataUrl;
   teamLogoA.value = typeof la === "string" && la.length > 0 ? la : null;
   teamLogoB.value = typeof lb === "string" && lb.length > 0 ? lb : null;
+  if ("organizerLogoDataUrl" in payload) {
+    const lo = payload.organizerLogoDataUrl;
+    organizerLogo.value = typeof lo === "string" && lo.length > 0 ? lo : null;
+  }
 
   const idx = Number(payload.periodIndex);
   periodIndex.value = Number.isFinite(idx) && idx >= 0 && idx < PERIOD_LABELS.length ? idx : 0;
@@ -441,6 +448,7 @@ function resetMatch() {
   teamColorB.value = TEAM_PALETTES.classic[1];
   teamLogoA.value = null;
   teamLogoB.value = null;
+  organizerLogo.value = null;
   send({ type: "reset_match" });
 }
 
@@ -480,7 +488,7 @@ function onTeamLogoFile(team: TeamKey, event: Event) {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   input.value = "";
-  if (!file || !file.type.startsWith("image/")) {
+  if (!file || !isLogoImageFile(file)) {
     return;
   }
   const reader = new FileReader();
@@ -490,6 +498,27 @@ function onTeamLogoFile(team: TeamKey, event: Event) {
     if (team === "A") teamLogoA.value = data;
     else teamLogoB.value = data;
     send({ type: "set_team_logo", team, dataUrl: data });
+  };
+  reader.readAsDataURL(file);
+}
+
+function openOrganizerLogoPicker() {
+  logoInputOrganizer.value?.click();
+}
+
+function onOrganizerLogoFile(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = "";
+  if (!file || !isLogoImageFile(file)) {
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => {
+    const data = reader.result;
+    if (typeof data !== "string") return;
+    organizerLogo.value = data;
+    send({ type: "set_organizer_logo", dataUrl: data });
   };
   reader.readAsDataURL(file);
 }
@@ -800,6 +829,33 @@ function onCustomAnnounceButtonClick() {
                 </div>
                 <span class="control-penalty-label" aria-label="Fautes équipe B">{{ penaltyB }} faute{{ penaltyB > 1 ? 's' : '' }}</span>
               </div>
+            </div>
+            <div class="control-organizer-bar" role="group" aria-label="Logo organisateur">
+              <span class="control-organizer-label">Organisateur</span>
+              <input
+                ref="logoInputOrganizer"
+                type="file"
+                class="control-team-logo-input"
+                accept="image/*"
+                tabindex="-1"
+                aria-hidden="true"
+                @change="onOrganizerLogoFile"
+              />
+              <button
+                type="button"
+                class="control-team-logo-btn"
+                :class="{ 'control-team-logo-btn--filled': !!organizerLogo }"
+                :aria-label="
+                  organizerLogo
+                    ? 'Changer le logo organisateur — choisir une image'
+                    : 'Ajouter un logo organisateur — choisir une image'
+                "
+                title="Logo organisateur"
+                @click="openOrganizerLogoPicker"
+              >
+                <img v-if="organizerLogo" class="control-team-logo-img" alt="" :src="organizerLogo" />
+                <span v-else class="control-team-logo-glyph" aria-hidden="true">＋</span>
+              </button>
             </div>
           </div>
         </section>
@@ -1244,6 +1300,22 @@ function onCustomAnnounceButtonClick() {
   gap: 1rem;
 }
 
+.control-organizer-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.control-organizer-label {
+  font-size: 0.85rem;
+  color: var(--text-muted, #888);
+  flex-shrink: 0;
+}
+
 /* iPad paysage 1024×768 : zones score à gauche et à droite, centre au milieu */
 @media (min-width: 900px) and (orientation: landscape), (min-width: 1024px) {
   .control-app {
@@ -1290,6 +1362,17 @@ function onCustomAnnounceButtonClick() {
     grid-column: 3;
     grid-row: 2;
     align-self: start;
+  }
+
+  .control-main > .control-section:nth-child(2) .control-organizer-bar {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    justify-self: center;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    flex-direction: row;
   }
 
   .control-main > .control-section:nth-child(3) {

@@ -64,6 +64,7 @@ La V1 fournit un pilotage **100% inline**: toutes les modifications se font dire
 - Sans logo, le comportement reste centré sur **nom** et **couleur d’équipe** comme aujourd’hui.
 - Le logo apparaît sur l’**affichage principal** dans chaque **panneau équipe**, **centré sous le nom** de la troupe ; une zone dédiée permet d’**ajouter** un logo (fichier image), sans libellé dans la zone (contrôle du même ordre que les autres boutons fantômes) ; **pour le remplacer**, l’opérateur **clique sur l’image** du logo (pas de bouton séparé pour retirer le logo depuis cet écran) ; les deux côtés utilisent la **même** présentation (dimensions de zone équivalentes).
 - Une fois renseignés, les logos doivent rester **exploitables en mode offline** pour un match complet (après chargement initial), sans préciser ici le mécanisme de stockage.
+- **Logo organisateur (optionnel)** : emplacement dédié en **bas à gauche** de l’affichage principal (visuel plus discret que les logos d’équipe) ; même principe d’ajout et de remplacement par **fichier image** (clic sur la zone ou sur l’image) ; réglable aussi depuis la **télécommande** lorsque la session distante est disponible.
 
 7. **Hiérarchie visuelle et repères équipe**
 

@@ -104,6 +104,8 @@ export interface MatchState {
   periodIndex: number;
   teamA: TeamState;
   teamB: TeamState;
+  /** Logo organisateur (optionnel), data URL ; coin bas gauche sur l’affichage. */
+  organizerLogoDataUrl: string | null;
   impro: ImproState;
   periodTimer: TimerState;
   overlay: OverlayState;
@@ -129,6 +131,7 @@ export interface PersistedMatchSnapshot {
   };
   overlay: OverlayState;
   status: MatchStatus;
+  organizerLogoDataUrl?: string | null;
 }
 
 export interface StorageSchemaV1 {
@@ -160,6 +163,8 @@ export interface RemoteStateSnapshot {
   };
   overlay: OverlayState;
   status: MatchStatus;
+  /** Présent sur les snapshots récents ; absent sur les anciennes sessions. */
+  organizerLogoDataUrl?: string | null;
   /** Modal QR affichée sur l’écran d’affichage (pour bouton poussoir sur la télécommande). */
   showRemoteQrModal?: boolean;
 }

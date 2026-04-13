@@ -60,6 +60,14 @@ describe("matchStore", () => {
     expect(store.match.teamB.logoDataUrl).toBeNull();
   });
 
+  it("sets organizer logo data url", () => {
+    const store = useMatchStore();
+    store.setOrganizerLogo("data:image/png;base64,org");
+    expect(store.match.organizerLogoDataUrl).toBe("data:image/png;base64,org");
+    store.setOrganizerLogo(null);
+    expect(store.match.organizerLogoDataUrl).toBeNull();
+  });
+
   it("nudges impro preset", () => {
     const store = useMatchStore();
     const current = store.match.impro.timer.presetSeconds;

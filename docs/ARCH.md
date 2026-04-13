@@ -15,7 +15,7 @@
 
 | Composant | Responsabilité |
 |----------|----------------|
-| **DisplayInline** | Affichage match, édition inline ; colonne centrale = **chrono impro** seul (grand ou compact selon focale) ; **chrono période** dans la barre basse au-dessus du libellé période ; barre = icônes annonces à gauche + bloc période (chrono + nav) au centre ; cartes équipe : nom puis logo |
+| **DisplayInline** | Affichage match, édition inline ; colonne centrale = **chrono impro** seul (grand ou compact selon focale) ; **chrono période** dans la barre basse au-dessus du libellé période ; barre = icônes annonces à gauche + bloc période (chrono + nav) au centre ; cartes équipe : nom puis logo ; **logo organisateur** optionnel fixé **bas gauche** (couche distincte du dock central) |
 | **HotspotLayer** | Rendu et dispatch des hotspots globaux superposés |
 | **InlineEditableText** | Gestion click-to-edit, commit/rollback clavier |
 | **OverlayPanel** | Affichage plein écran des annonces (clic pour fermeture) |
@@ -36,3 +36,4 @@
 - Modèle pénalités manuel (3 pastilles par équipe), sans automatisme de score.
 - Réglage du chrono impro par paires de flèches séparées: minutes à gauche, secondes à droite.
 - Équipe : champs optionnels `logoDataUrl` (image inline pour offline) et `voteCardColor` (hex, défauts rouge/blanc gauche/droite, **sans contrôle ni aperçu** sur l’affichage principal) dans `TeamState`, sérialisés avec le match persisté et les snapshots remote.
+- **Organisateur** : `organizerLogoDataUrl` optionnel au niveau `MatchState` (même principe de data URL), persisté et synchronisé avec la télécommande ; commande remote `set_organizer_logo`.

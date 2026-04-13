@@ -64,6 +64,7 @@ const makeDefaultState = (): MatchState => ({
     logoDataUrl: null,
     voteCardColor: DEFAULT_VOTE_CARD_COLOR_B
   },
+  organizerLogoDataUrl: null,
   impro: {
     theme: "Titre de l'improvisation",
     category: "Libre",
@@ -152,6 +153,10 @@ export const useMatchStore = defineStore("match", () => {
             customOverlayText: m.overlay?.customOverlayText ?? null
           };
       match.value.status = m.status ?? match.value.status;
+      match.value.organizerLogoDataUrl =
+        typeof m.organizerLogoDataUrl === "string" && m.organizerLogoDataUrl.length > 0
+          ? m.organizerLogoDataUrl
+          : null;
     }
   };
 
@@ -180,7 +185,8 @@ export const useMatchStore = defineStore("match", () => {
           remainingSeconds: match.value.periodTimer.remainingSeconds
         },
         overlay: { ...match.value.overlay },
-        status: match.value.status
+        status: match.value.status,
+        organizerLogoDataUrl: match.value.organizerLogoDataUrl
       }
     };
 
@@ -487,6 +493,10 @@ export const useMatchStore = defineStore("match", () => {
     match.value.teamB.logoDataUrl = dataUrl;
   };
 
+  const setOrganizerLogo = (dataUrl: string | null) => {
+    match.value.organizerLogoDataUrl = dataUrl;
+  };
+
   const setVoteCardColor = (team: TeamKey, hex: string) => {
     const trimmed = hex.trim();
     if (!/^#[0-9A-Fa-f]{6}$/.test(trimmed)) {
@@ -588,6 +598,7 @@ export const useMatchStore = defineStore("match", () => {
     clearOverlay,
     cycleTeamColor,
     setTeamLogo,
+    setOrganizerLogo,
     setVoteCardColor,
     setPalette,
     updateScale,
