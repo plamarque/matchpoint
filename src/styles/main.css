@@ -270,6 +270,8 @@ html {
 }
 
 .team-card {
+  /* Unités cq* pour le score et le logo : relatives à la carte, pas au viewport entier */
+  container-type: size;
   background: linear-gradient(145deg, color-mix(in srgb, var(--team-color) 72%, black), color-mix(in srgb, var(--team-color) 45%, #12263a));
   border-radius: var(--radius);
   box-shadow: 0 16px 48px rgb(0 0 0 / 32%);
@@ -289,7 +291,7 @@ html {
   height: auto;
   max-height: min(52vh, 100%);
   align-self: center;
-  overflow-x: clip;
+  overflow: clip;
 }
 
 .team-card--scoreboard {
@@ -317,6 +319,7 @@ html {
   gap: clamp(0.35rem, 1.1vh, 0.65rem);
   width: 100%;
   min-width: 0;
+  min-height: 0;
   position: relative;
   z-index: 14;
 }
@@ -347,6 +350,7 @@ html {
 .team-logo-frame {
   position: relative;
   width: min(100%, 20rem);
+  width: min(100%, 20rem, 44cqw);
   aspect-ratio: 1 / 1;
   border-radius: 0;
   box-sizing: border-box;
@@ -475,6 +479,7 @@ html {
   margin: 0;
   font-family: var(--font-display);
   font-size: clamp(2.75rem, 9vw, 9.25rem);
+  font-size: clamp(2.75rem, min(24cqw, 22cqh), 9.25rem);
   font-weight: 800;
   line-height: 0.9;
   width: 100%;
@@ -488,8 +493,10 @@ html {
   position: relative;
   display: grid;
   place-items: center;
+  align-content: center;
   width: 100%;
   min-width: 0;
+  min-height: 0;
 }
 
 /* Triangle en coin pour changer la couleur — inférieur gauche (A) / inférieur droit (B) */
@@ -1466,6 +1473,7 @@ html.contrast-high {
 
   .team-score {
     font-size: clamp(2.5rem, 18vw, 8rem);
+    font-size: clamp(2.5rem, min(20cqw, 18cqh), 8rem);
   }
 
   .overlay-hotbar {
@@ -1507,6 +1515,7 @@ html.contrast-high {
 
   .team-score {
     font-size: clamp(4.65rem, 21vw, 11.25rem);
+    font-size: clamp(4.65rem, min(28cqw, 26cqh), 11.25rem);
   }
 }
 
@@ -1567,11 +1576,13 @@ html.contrast-high {
 
   .team-logo-frame {
     width: min(100%, 17rem);
+    width: min(100%, 17rem, 40cqw);
     aspect-ratio: 1 / 1;
   }
 
   .team-score {
     font-size: clamp(3.85rem, 17vw, 8.5rem);
+    font-size: clamp(3.85rem, min(24cqw, 22cqh), 8.5rem);
   }
 
   .score-side-btn {
