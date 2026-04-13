@@ -33,6 +33,33 @@ html {
   overflow-x: hidden;
 }
 
+/*
+ * Route affichage (/) : la chaîne min-height: 100% sans hauteur explicite sur html/body
+ * laisse parfois le document quelques pixels plus haut que le viewport (arrondis, sous-pixels).
+ * On fige la hauteur et on coupe le défilement fenêtre ; le scroll reste dans main.display-inline.
+ * (/control et /remote ne matchent pas ce sélecteur.)
+ */
+html:has(main.display-inline) {
+  height: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+html:has(main.display-inline) body,
+html:has(main.display-inline) #app {
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+html:has(main.display-inline) main.display-inline {
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+}
+
 .display-inline {
   --display-inline-pad-x: max(
     clamp(1rem, 2.2vw, 2rem),
@@ -41,6 +68,10 @@ html {
   );
   min-height: 100vh;
   min-height: 100dvh;
+  /* Empêche le défilement au niveau du document quand le bloc s’étire au-delà du viewport
+     (flex, sous-totaux) : le surplus reste dans ce conteneur (overflow-y: auto). */
+  max-height: 100vh;
+  max-height: 100dvh;
   padding-top: clamp(1.1rem, 2.6vh, 2rem);
   padding-bottom: calc(clamp(1.3rem, 2.8vh, 2.2rem) + clamp(6rem, 15vh, 9.5rem));
   padding-left: var(--display-inline-pad-x);
@@ -49,6 +80,10 @@ html {
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
+  /* Chrome : flex-basis auto laisse parfois quelques px de trop-haut → scrollbar pleine largeur.
+     Masquée visuellement ; le défilement (trackpad / molette) reste possible si besoin. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -57,8 +92,13 @@ html {
   box-sizing: border-box;
 }
 
+.display-inline::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 .display-inline-scale {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-height: 0;
   width: 100%;
   display: grid;
@@ -1632,6 +1672,8 @@ html.contrast-high {
     padding-right: var(--display-inline-pad-x);
     min-height: 100vh;
     min-height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
     align-items: stretch;
   }
 
