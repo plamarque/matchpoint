@@ -738,47 +738,6 @@ html {
   min-height: 0;
 }
 
-.center-stack .timer-card--compact {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 0;
-  max-height: min(42%, 14rem);
-  padding: 0.2rem 0 0;
-}
-
-.center-stack .timer-card--compact .dock-period-mm.clock,
-.center-stack .timer-card--compact .dock-period-ss.clock {
-  font-size: clamp(2.75rem, min(8.5vw, 19cqi), 5.5rem);
-  margin: 0;
-  min-width: 2.6ch;
-  text-align: center;
-}
-
-.center-stack .timer-card--compact .dock-period-colon {
-  font-size: clamp(2.75rem, min(8.5vw, 19cqi), 5.5rem);
-}
-
-.center-stack .timer-card--compact .impro-clock-grid .dock-period-arrow {
-  width: clamp(2.95rem, 5.2vw, 4.15rem);
-  height: clamp(2.45rem, 4.4vw, 3.45rem);
-  font-size: clamp(1.4rem, 2.5vw, 2.05rem);
-}
-
-.center-stack .timer-card--compact .impro-clock-grid .impro-clock-btn--play,
-.center-stack .timer-card--compact .impro-clock-grid .impro-clock-btn--reset {
-  width: clamp(2.75rem, min(5.8vw, 7.85cqi), 3.95rem);
-  height: clamp(2.45rem, min(5.1vw, 7cqi), 3.55rem);
-}
-
-.center-stack .timer-card--compact .impro-clock-grid .impro-clock-btn--play {
-  font-size: clamp(1.5rem, min(3.1vw, 3.95cqi), 2.2rem);
-}
-
-.center-stack .timer-card--compact .impro-clock-grid .impro-clock-btn--reset {
-  font-size: clamp(1.85rem, min(3.75vw, 4.65cqi), 2.85rem);
-}
-
 /* Même marges que .center-stack-category (ext.) + .category-inline--center-stack (int.) */
 .center-stack-timer-zone {
   width: 100%;
@@ -836,11 +795,6 @@ html {
 
 .center-stack .impro-clock-grid__cell .inline-editable {
   max-width: 100%;
-}
-
-.center-stack .timer-card--compact .impro-clock-grid {
-  flex: 0 1 auto;
-  min-height: 0;
 }
 
 .center-stack .timer-card--primary .dock-period-mm.clock,
@@ -1075,10 +1029,6 @@ html {
   text-shadow:
     0 0 28px color-mix(in srgb, var(--success) 35%, transparent),
     0 2px 12px rgb(0 0 0 / 35%);
-}
-
-.center-stack .timer-card--compact {
-  opacity: 1;
 }
 
 .clock {

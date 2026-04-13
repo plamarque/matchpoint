@@ -521,13 +521,8 @@ onUnmounted(() => {
 
           <div class="center-stack-timer-zone">
             <article
-              class="timer-card"
-              :class="[
-                primaryChronoIsImpro ? 'timer-card--primary' : 'timer-card--compact',
-                {
-                  running: primaryChronoIsImpro ? primaryTimerRunning : secondaryTimerRunning
-                }
-              ]"
+              class="timer-card timer-card--primary"
+              :class="{ running: match.impro.isRunning }"
             >
               <div
                 class="impro-clock-grid"
